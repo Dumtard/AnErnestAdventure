@@ -5,33 +5,56 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.thesis.ernestadventure.Network.Move;
+import com.thesis.ernestadventure.Network.Stop;
 
 public class Controller implements InputProcessor {
-  Player player;
-  Client client;
+  private final float GRAVITY = 0.5f;
+  
+  private Player player;
+  private Client client;
 
-  Controller(Client client, Player player) {
+  public Controller(Client client, Player player) {
     Gdx.input.setInputProcessor(this);
     this.player = player;
     this.client = client;
   }
 
+  public void update() {
+    //Apply Gravity
+    player.setVelocity(player.getVelocity().x, player.getVelocity().y - GRAVITY);
+    
+    //Update Player location
+    player.setPosition(player.getPosition().x + player.getVelocity().x,
+                       player.getPosition().y + player.getVelocity().y);
+
+    //Collision
+    if (player.getPosition().y <= 96) {
+      player.setPosition(player.getPosition().x, 96);
+      player.setVelocity(player.getVelocity().x, 0);
+    }
+  }
+  
   @Override
   public boolean keyDown(int keycode) {
     // Gdx.app.log("Key", "" + keycode);
 
+    //Left arrow
     if (keycode == 21) {
-      player.setVelocity(new Vector2(-2, player.getVelocity().y));
+      player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
+      
+    //Right arrow
     } else if (keycode == 22) {
-      player.setVelocity(new Vector2(2, player.getVelocity().y));
+      player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
+      
+    //Space Bar
     } else if (keycode == 62) {
-      player.setVelocity(new Vector2(player.getVelocity().x, 4));
+      player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
@@ -44,10 +67,19 @@ public class Controller implements InputProcessor {
   public boolean keyUp(int keycode) {
     // Gdx.app.log("Key", "" + keycode);
 
+    //Left arrow
     if (keycode == 21) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
+      Stop stop = new Stop();
+      stop.position = player.getPosition();
+      client.sendTCP(stop);
+      
+    //Right arrow
     } else if (keycode == 22) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
+      Stop stop = new Stop();
+      stop.position = player.getPosition();
+      client.sendTCP(stop);
     }
 
     return false;
@@ -63,17 +95,17 @@ public class Controller implements InputProcessor {
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
     // Gdx.app.log("Cursor" + pointer, screenX + ", " + screenY);
     if (screenX <= 400 && screenY > 240) {
-      player.setVelocity(new Vector2(-2, player.getVelocity().y));
+      player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
     } else if (screenX >= 400 && screenY > 240) {
-      player.setVelocity(new Vector2(2, player.getVelocity().y));
+      player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
     } else if (screenY < 240) {
-      player.setVelocity(new Vector2(player.getVelocity().x, 4));
+      player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
       move.velocity = player.getVelocity();
       client.sendTCP(move);
@@ -86,8 +118,14 @@ public class Controller implements InputProcessor {
   public boolean touchUp(int screenX, int screenY, int pointer, int button) {
     if (screenX <= 400 && screenY > 240) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
+      Stop stop = new Stop();
+      stop.position = player.getPosition();
+      client.sendTCP(stop);
     } else if (screenX >= 400 && screenY > 240) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
+      Stop stop = new Stop();
+      stop.position = player.getPosition();
+      client.sendTCP(stop);
     }
     return false;
   }

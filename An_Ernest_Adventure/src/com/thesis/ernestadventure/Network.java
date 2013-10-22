@@ -12,8 +12,9 @@ public class Network {
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
 		kryo.register(Login.class);
-		kryo.register(Move.class);
 		kryo.register(Vector2.class);
+		kryo.register(Move.class);
+		kryo.register(Stop.class);
 	}
 
 	static public class Login {
@@ -22,5 +23,9 @@ public class Network {
 	
 	static public class Move {
 		public Vector2 velocity;
+	}
+	
+	static public class Stop {
+	  public Vector2 position;
 	}
 }

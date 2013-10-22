@@ -12,11 +12,11 @@ public class Player {
   private Vector2 position;
   private Vector2 velocity;
 
-  /* Temp */
+  //TODO Remove these textures and sprites
   private Texture texture;
   private Sprite sprite;
 
-  Player() {
+  public Player() {
     position = new Vector2(0, 500);
     velocity = new Vector2(0, 0);
 
@@ -58,20 +58,9 @@ public class Player {
     this.velocity.set(velocity);
   }
 
-  /* Temp */
-  public void update() {
-    setVelocity(getVelocity().x, getVelocity().y - (float) 0.1);
-    position.x += velocity.x;
-    position.y += velocity.y;
-    sprite.setPosition(position.x, position.y);
-
-    if (position.y <= 96) {
-      position.y = 96;
-      velocity.y = 0;
-    }
-  }
-
+  //TODO Remove these functions to appropriate classes
   public void draw(SpriteBatch batch) {
+    sprite.setPosition(position.x, position.y);
     sprite.draw(batch);
   }
 }
