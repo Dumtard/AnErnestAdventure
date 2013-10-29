@@ -6,7 +6,11 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.thesis.ernestadventure.Network.Login;
+import com.thesis.ernestadventure.Network.Move;
+import com.thesis.ernestadventure.Network.Stop;
 
 public class Game implements ApplicationListener {
   private Player player;
@@ -25,9 +29,30 @@ public class Game implements ApplicationListener {
     client.start();
     Network.register(client);
 
+    client.addListener(new Listener() {
+      public void received(Connection c, Object object) {
+        if (object instanceof Login) {
+          System.out.println(((Login) object).name);
+
+          return;
+        } else if (object instanceof Move) {
+          System.out.println("Moving speed: " + ((Move) object).velocity.x + ", "
+              + ((Move) object).velocity.y);
+          
+          return;
+        } else if (object instanceof Stop) {
+          System.out.println("Stopped at: " + ((Stop) object).position.x + ", "
+              + ((Stop) object).position.y);
+
+          return;
+        }
+      }
+    });
+    
     try {
-       client.connect(5000, "localhost", 54555);
-//      client.connect(5000, "10.101.106.77", 54555);
+      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
+//    client.connect(5000, "10.121.109.105", 54555, 54555); // Use this for android
+//    client.connect(5000, client.discoverHost(54777, 5000), 54555, 54777); // This doesn't work currently
     } catch (IOException ex) {
       ex.printStackTrace();
     }

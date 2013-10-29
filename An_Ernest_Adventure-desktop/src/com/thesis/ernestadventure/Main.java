@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "An_Ernest_Adventure";
 		cfg.useGL20 = false;
-		cfg.width = 800;
-		cfg.height = 480;
+		cfg.width = 1200;
+		cfg.height = 720;
 		
 		new LwjglApplication(new Game(), cfg);
 	}

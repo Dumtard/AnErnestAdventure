@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class View {
-  private float width;
-  private float height;
+  private int width;
+  private int height;
   
   private OrthographicCamera camera;
   private SpriteBatch batch;

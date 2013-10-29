@@ -18,9 +18,12 @@ public class ErnestServer {
     server = new Server();
 
     Network.register(server);
-
+    
     server.addListener(new Listener() {
       public void received(Connection c, Object object) {
+        Connection[] connections = new Connection[3];
+        connections = server.getConnections();
+        
         if (object instanceof Login) {
           System.out.println(((Login) object).name);
 
@@ -29,17 +32,29 @@ public class ErnestServer {
           System.out.println("Moving speed: " + ((Move) object).velocity.x + ", "
               + ((Move) object).velocity.y);
 
+          for (int i = 0; i < connections.length; i++) {
+            if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
+              connections[i].sendUDP(object);
+            }
+          }
+          
           return;
         } else if (object instanceof Stop) {
           System.out.println("Stopped at: " + ((Stop) object).position.x + ", "
               + ((Stop) object).position.y);
+          
+          for (int i = 0; i < connections.length; i++) {
+            if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
+              connections[i].sendUDP(object);
+            }
+          }
           
           return;
         }
       }
     });
 
-    server.bind(54555);
+    server.bind(54555, 54555);
     server.start();
   }
 

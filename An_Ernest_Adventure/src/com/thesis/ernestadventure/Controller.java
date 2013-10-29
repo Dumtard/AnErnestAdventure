@@ -43,21 +43,21 @@ public class Controller implements InputProcessor {
       player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
       
     //Right arrow
     } else if (keycode == 22) {
       player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
       
     //Space Bar
     } else if (keycode == 62) {
       player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
     }
 
     return false;
@@ -72,14 +72,14 @@ public class Controller implements InputProcessor {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
       stop.position = player.getPosition();
-      client.sendTCP(stop);
+      client.sendUDP(stop);
       
     //Right arrow
     } else if (keycode == 22) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
       stop.position = player.getPosition();
-      client.sendTCP(stop);
+      client.sendUDP(stop);
     }
 
     return false;
@@ -98,17 +98,17 @@ public class Controller implements InputProcessor {
       player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
     } else if (screenX >= 400 && screenY > 240) {
       player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
     } else if (screenY < 240) {
       player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
       move.velocity = player.getVelocity();
-      client.sendTCP(move);
+      client.sendUDP(move);
     }
 
     return false;
@@ -120,12 +120,12 @@ public class Controller implements InputProcessor {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
       stop.position = player.getPosition();
-      client.sendTCP(stop);
+      client.sendUDP(stop);
     } else if (screenX >= 400 && screenY > 240) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
       stop.position = player.getPosition();
-      client.sendTCP(stop);
+      client.sendUDP(stop);
     }
     return false;
   }
