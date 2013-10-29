@@ -21,17 +21,20 @@ public class ErnestServer {
     
     server.addListener(new Listener() {
       public void received(Connection c, Object object) {
-        Connection[] connections = new Connection[3];
+        Connection[] connections = new Connection[10];
         connections = server.getConnections();
         
         if (object instanceof Login) {
-          System.out.println(((Login) object).name);
-
+          System.out.println(((Login) object).name + " has logged on");
+          
+          for (int i = 0; i < connections.length; i++) {
+            if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
+              connections[i].sendUDP(object);
+            }
+          }
+          
           return;
         } else if (object instanceof Move) {
-          System.out.println("Moving speed: " + ((Move) object).velocity.x + ", "
-              + ((Move) object).velocity.y);
-
           for (int i = 0; i < connections.length; i++) {
             if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
               connections[i].sendUDP(object);
@@ -40,9 +43,6 @@ public class ErnestServer {
           
           return;
         } else if (object instanceof Stop) {
-          System.out.println("Stopped at: " + ((Stop) object).position.x + ", "
-              + ((Stop) object).position.y);
-          
           for (int i = 0; i < connections.length; i++) {
             if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
               connections[i].sendUDP(object);

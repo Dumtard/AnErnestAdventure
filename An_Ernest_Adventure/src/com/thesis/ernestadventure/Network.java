@@ -22,10 +22,12 @@ public class Network {
 	}
 	
 	static public class Move {
+	  public String name;
 		public Vector2 velocity;
 	}
 	
 	static public class Stop {
+	  public String name;
 	  public Vector2 position;
 	}
 }

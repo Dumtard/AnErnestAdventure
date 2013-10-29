@@ -42,6 +42,7 @@ public class Controller implements InputProcessor {
     if (keycode == 21) {
       player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
       
@@ -49,6 +50,7 @@ public class Controller implements InputProcessor {
     } else if (keycode == 22) {
       player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
       
@@ -56,6 +58,7 @@ public class Controller implements InputProcessor {
     } else if (keycode == 62) {
       player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
     }
@@ -71,6 +74,7 @@ public class Controller implements InputProcessor {
     if (keycode == 21) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
+      stop.name = Game.loginName;
       stop.position = player.getPosition();
       client.sendUDP(stop);
       
@@ -78,6 +82,7 @@ public class Controller implements InputProcessor {
     } else if (keycode == 22) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
+      stop.name = Game.loginName;
       stop.position = player.getPosition();
       client.sendUDP(stop);
     }
@@ -97,16 +102,19 @@ public class Controller implements InputProcessor {
     if (screenX <= 400 && screenY > 240) {
       player.setVelocity(new Vector2(-3.0f, player.getVelocity().y));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
     } else if (screenX >= 400 && screenY > 240) {
       player.setVelocity(new Vector2(3.0f, player.getVelocity().y));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
     } else if (screenY < 240) {
       player.setVelocity(new Vector2(player.getVelocity().x, 8.5f));
       Move move = new Move();
+      move.name = Game.loginName;
       move.velocity = player.getVelocity();
       client.sendUDP(move);
     }
@@ -119,11 +127,13 @@ public class Controller implements InputProcessor {
     if (screenX <= 400 && screenY > 240) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
+      stop.name = Game.loginName;
       stop.position = player.getPosition();
       client.sendUDP(stop);
     } else if (screenX >= 400 && screenY > 240) {
       player.setVelocity(new Vector2(0, player.getVelocity().y));
       Stop stop = new Stop();
+      stop.name = Game.loginName;
       stop.position = player.getPosition();
       client.sendUDP(stop);
     }

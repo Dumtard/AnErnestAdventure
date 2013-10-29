@@ -20,6 +20,8 @@ public class Game implements ApplicationListener {
   private Controller controller;
   private View view;
 
+  public static String loginName;
+  
   @Override
   public void create() {
     
@@ -29,19 +31,21 @@ public class Game implements ApplicationListener {
     client.start();
     Network.register(client);
 
+    
+    
     client.addListener(new Listener() {
       public void received(Connection c, Object object) {
         if (object instanceof Login) {
-          System.out.println(((Login) object).name);
+          System.out.println(((Login) object).name + " has joined");
 
           return;
         } else if (object instanceof Move) {
-          System.out.println("Moving speed: " + ((Move) object).velocity.x + ", "
+          System.out.println(((Move) object).name + ": " + ((Move) object).velocity.x + ", "
               + ((Move) object).velocity.y);
           
           return;
         } else if (object instanceof Stop) {
-          System.out.println("Stopped at: " + ((Stop) object).position.x + ", "
+          System.out.println(((Move) object).name + ": " + ((Stop) object).position.x + ", "
               + ((Stop) object).position.y);
 
           return;
@@ -61,7 +65,7 @@ public class Game implements ApplicationListener {
     view = new View(player);
     
     Login login = new Login();
-    login.name = "Charles";
+    login.name = Game.loginName;
 
     client.sendTCP(login);
   }
