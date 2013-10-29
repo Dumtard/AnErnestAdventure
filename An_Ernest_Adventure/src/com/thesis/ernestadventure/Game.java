@@ -20,7 +20,7 @@ public class Game implements ApplicationListener {
   private Controller controller;
   private View view;
 
-  public static String loginName;
+  public static final String loginName = "Charles";
   
   @Override
   public void create() {
@@ -45,7 +45,7 @@ public class Game implements ApplicationListener {
           
           return;
         } else if (object instanceof Stop) {
-          System.out.println(((Move) object).name + ": " + ((Stop) object).position.x + ", "
+          System.out.println(((Stop) object).name + ": " + ((Stop) object).position.x + ", "
               + ((Stop) object).position.y);
 
           return;

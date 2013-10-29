@@ -25,7 +25,9 @@ public class ErnestServer {
         connections = server.getConnections();
         
         if (object instanceof Login) {
-          System.out.println(((Login) object).name + " has logged on");
+          System.out.println(((Login) object).name + " has logged on.");
+          
+          System.out.println(connections.length + " users currently online.");
           
           for (int i = 0; i < connections.length; i++) {
             if (c.getRemoteAddressUDP().getAddress() != connections[i].getRemoteAddressUDP().getAddress()) {
