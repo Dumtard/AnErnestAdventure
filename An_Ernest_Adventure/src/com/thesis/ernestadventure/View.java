@@ -1,5 +1,9 @@
 package com.thesis.ernestadventure;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -15,19 +19,19 @@ public class View {
   private OrthographicCamera camera;
   private SpriteBatch batch;
   
-  private Player player;
+  private HashMap<String, Player> players;
   
   //TODO Remove these textures and sprites
   private Texture texture;
   private Sprite sprite;
   
-  public View(Player player) {
+  public View(HashMap<String, Player> players) {
     width = Gdx.graphics.getWidth();
     height = Gdx.graphics.getHeight();
     
     batch = new SpriteBatch();
     
-    this.player = player;
+    this.players = players;
     
     camera = new OrthographicCamera(width, height);
     camera.translate(width / 2, height / 2);
@@ -50,7 +54,9 @@ public class View {
     
     batch.setProjectionMatrix(camera.combined);
     batch.begin();
-    player.draw(batch);
+    for (Map.Entry<String, Player> player: players.entrySet()) {
+      player.getValue().draw(batch);
+    }
     sprite.draw(batch);
     batch.end();
   }

@@ -1,6 +1,8 @@
 package com.thesis.ernestadventure;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -13,19 +15,18 @@ import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class Game implements ApplicationListener {
-  private Player player;
+  private HashMap<String, Player> players = new HashMap<String, Player>();
 
   private Client client;
 
   private Controller controller;
   private View view;
 
-  public static String loginName;
+  public static final String loginName = "kokiri";
   
   @Override
   public void create() {
-    
-    player = new Player();
+    players.put(Game.loginName, new Player());
     
     client = new Client();
     client.start();
@@ -37,6 +38,7 @@ public class Game implements ApplicationListener {
       public void received(Connection c, Object object) {
         if (object instanceof Login) {
           System.out.println(((Login) object).name + " has joined");
+          players.put(((Login)object).name, new Player());
 
           return;
         } else if (object instanceof Move) {
@@ -61,8 +63,8 @@ public class Game implements ApplicationListener {
       ex.printStackTrace();
     }
     
-    controller = new Controller(client, player);
-    view = new View(player);
+    controller = new Controller(client, players.get(Game.loginName));
+    view = new View(players);
     
     Login login = new Login();
     login.name = Game.loginName;
@@ -73,7 +75,9 @@ public class Game implements ApplicationListener {
   @Override
   public void dispose() {
     view.dispose();
-    player.dispose();
+    for (Map.Entry<String, Player> player: players.entrySet()) {
+      player.getValue().dispose();
+    }
   }
 
   @Override

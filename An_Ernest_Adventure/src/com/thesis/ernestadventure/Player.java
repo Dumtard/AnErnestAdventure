@@ -29,6 +29,20 @@ public class Player {
     sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
     sprite.setPosition(position.x, position.y);
   }
+  
+  public Player(String n) {
+    position = new Vector2(0, 500);
+    velocity = new Vector2(0, 0);
+
+    texture = new Texture(Gdx.files.internal("data/Ernest.png"));
+    texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+    TextureRegion region = new TextureRegion(texture, 0, 0, 32, 64);
+
+    sprite = new Sprite(region);
+    sprite.setOrigin(sprite.getWidth() / 2, sprite.getHeight() / 2);
+    sprite.setPosition(position.x, position.y);
+  }
 
   public void dispose() {
     texture.dispose();
