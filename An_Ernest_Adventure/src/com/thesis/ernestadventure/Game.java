@@ -47,7 +47,7 @@ public class Game implements ApplicationListener {
           
           return;
         } else if (object instanceof Stop) {
-          System.out.println(((Move) object).name + ": " + ((Stop) object).position.x + ", "
+          System.out.println(((Stop) object).name + ": " + ((Stop) object).position.x + ", "
               + ((Stop) object).position.y);
 
           return;
