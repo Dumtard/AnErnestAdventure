@@ -22,7 +22,11 @@ public class Game implements ApplicationListener {
   private Controller controller;
   private View view;
 
+<<<<<<< HEAD
   public static final String loginName = "kokiri";
+=======
+  public static final String loginName = "Charles";
+>>>>>>> 584fc89f3bebac78092680b00bf16a05cf5cc0da
   
   @Override
   public void create() {
@@ -45,16 +49,11 @@ public class Game implements ApplicationListener {
           System.out.println(((Move) object).name + ": " + ((Move) object).velocity.x + ", "
               + ((Move) object).velocity.y);
           
-          players.get(((Move) object).name).setVelocity(((Move) object).velocity);
-          
           return;
         } else if (object instanceof Stop) {
           System.out.println(((Stop) object).name + ": " + ((Stop) object).position.x + ", "
               + ((Stop) object).position.y);
 
-          players.get(((Stop) object).name).setPosition(((Stop) object).position);
-          players.get(((Stop) object).name).setVelocity(0, 0);
-          
           return;
         }
       }
@@ -68,7 +67,7 @@ public class Game implements ApplicationListener {
       ex.printStackTrace();
     }
     
-    controller = new Controller(client, players);
+    controller = new Controller(client, players.get(Game.loginName));
     view = new View(players);
     
     Login login = new Login();
@@ -80,9 +79,9 @@ public class Game implements ApplicationListener {
   @Override
   public void dispose() {
     view.dispose();
-//    for (Map.Entry<String, Player> player: players.entrySet()) {
-//      player.getValue().dispose();
-//    }
+    for (Map.Entry<String, Player> player: players.entrySet()) {
+      player.getValue().dispose();
+    }
   }
 
   @Override

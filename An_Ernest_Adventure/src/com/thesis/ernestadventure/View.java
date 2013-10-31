@@ -2,7 +2,6 @@ package com.thesis.ernestadventure;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +19,10 @@ public class View {
   private SpriteBatch batch;
   
   private HashMap<String, Player> players;
+
+  private Texture playerTexture;
+  private Sprite playerSprite;
+  private Sprite player2Sprite;
   
   //TODO Remove these textures and sprites
   private Texture texture;
@@ -36,6 +39,17 @@ public class View {
     camera = new OrthographicCamera(width, height);
     camera.translate(width / 2, height / 2);
     
+    playerTexture = new Texture(Gdx.files.internal("data/Ernest.png"));
+    playerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+    TextureRegion playerRegion = new TextureRegion(playerTexture, 0, 0, 32, 64);
+
+    playerSprite = new Sprite(playerRegion);
+    playerSprite.setOrigin(playerSprite.getWidth() / 2, playerSprite.getHeight() / 2);
+    player2Sprite = new Sprite(playerRegion);
+    player2Sprite.setOrigin(player2Sprite.getWidth() / 2, player2Sprite.getHeight() / 2);
+    
+    //TODO Remove this
     texture = new Texture(Gdx.files.internal("data/libgdx.png"));
     texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
@@ -47,6 +61,8 @@ public class View {
   
   public void dispose() {
     batch.dispose();
+    texture.dispose();
+    playerTexture.dispose();
   }
   
   public void render() {
@@ -55,8 +71,18 @@ public class View {
     batch.setProjectionMatrix(camera.combined);
     batch.begin();
     for (Map.Entry<String, Player> player: players.entrySet()) {
-      player.getValue().draw(batch);
+//      player.getValue().draw(batch);
+      player2Sprite.setPosition(player.getValue().getPosition().x,
+                               player.getValue().getPosition().y);
+      player2Sprite.draw(batch);
     }
+    playerSprite.setPosition(players.get("kokiri").getPosition().x,
+        players.get("kokiri").getPosition().y);
+    
+    /*System.out.println(players.get("kokiri").getPosition().x + ", " +
+        players.get("kokiri").getPosition().y);*/
+    
+    playerSprite.draw(batch);
     sprite.draw(batch);
     batch.end();
   }
