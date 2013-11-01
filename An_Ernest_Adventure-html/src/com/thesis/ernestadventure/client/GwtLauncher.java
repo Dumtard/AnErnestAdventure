@@ -1,9 +1,9 @@
 package com.thesis.ernestadventure.client;
 
-import com.thesis.ernestadventure.Game;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.thesis.ernestadventure.ErnestGame;
 
 public class GwtLauncher extends GwtApplication {
 	@Override
@@ -14,6 +14,6 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener getApplicationListener () {
-		return new Game();
+		return new ErnestGame();
 	}
 }

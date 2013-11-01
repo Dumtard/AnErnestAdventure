@@ -11,6 +11,6 @@ public class Main {
 		cfg.width = 1200;
 		cfg.height = 720;
 		
-		new LwjglApplication(new Game(), cfg);
+		new LwjglApplication(new ErnestGame(), cfg);
 	}
 }

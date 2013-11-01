@@ -3,8 +3,8 @@ package com.thesis.ernestadventure;
 import java.io.IOException;
 import java.util.HashMap;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -14,21 +14,21 @@ import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Stop;
 
-public class Game implements ApplicationListener {
+public class GameScreen implements Screen {
   private HashMap<String, Player> players = new HashMap<String, Player>();
-
-  private Client client;
 
   private Controller controller;
   private View view;
-
-  public static final String loginName = "dumtard";
   
-  @Override
-  public void create() {
-    players.put(Game.loginName, new Player());
+  private Client client;
+  
+  public GameScreen() {
+    players.put(ErnestGame.loginName, new Player());
     
     client = new Client();
+    controller = new Controller(client, players);
+    view = new View(players);
+    
     client.start();
     Network.register(client);
    
@@ -64,45 +64,55 @@ public class Game implements ApplicationListener {
     });
     
     try {
-      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
-//    client.connect(5000, "10.121.109.105", 54555, 54555); // Use this for android
-//    client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
+//      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
+      client.connect(5000, "10.101.244.67", 54555, 54555); // Use this for android
+//      client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
     } catch (IOException ex) {
       ex.printStackTrace();
     }
     
-    controller = new Controller(client, players);
-    view = new View(players);
-    
     Connect login = new Connect();
-    login.name = Game.loginName;
+    login.name = ErnestGame.loginName;
 
     client.sendTCP(login);
+  }
+  
+  @Override
+  public void render(float delta) {
+    Gdx.gl.glClearColor(0, 0, 0, 1);
+    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+    
+    controller.update();
+    view.render(delta);
+  }
+
+  @Override
+  public void resize(int width, int height) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void show() {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void hide() {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void pause() {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void resume() {
+    // TODO Auto-generated method stub
   }
 
   @Override
   public void dispose() {
     view.dispose();
-  }
-
-  @Override
-  public void render() {
-    Gdx.gl.glClearColor(0, 0, 0, 1);
-    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-    
-    controller.update();
-    view.render();
-  }
-
-  @Override
-  public void resize(int width, int height) {
-  }
-
-  @Override
-  public void pause() {
-  }
-
-  @Override
-  public void resume() {
   }
 }

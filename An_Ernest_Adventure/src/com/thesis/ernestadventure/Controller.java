@@ -45,26 +45,26 @@ public class Controller implements InputProcessor {
 
     //Left arrow
     if (keycode == 21) {
-      players.get(Game.loginName).setVelocity(new Vector2(-3.0f, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(-3.0f, players.get(ErnestGame.loginName).getVelocity().y));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
       
     //Right arrow
     } else if (keycode == 22) {
-      players.get(Game.loginName).setVelocity(new Vector2(3.0f, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(3.0f, players.get(ErnestGame.loginName).getVelocity().y));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
       
     //Space Bar
     } else if (keycode == 62) {
-      players.get(Game.loginName).setVelocity(new Vector2(players.get(Game.loginName).getVelocity().x, 8.5f));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(players.get(ErnestGame.loginName).getVelocity().x, 8.5f));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
     }
 
@@ -77,18 +77,18 @@ public class Controller implements InputProcessor {
 
     //Left arrow
     if (keycode == 21) {
-      players.get(Game.loginName).setVelocity(new Vector2(0, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(0, players.get(ErnestGame.loginName).getVelocity().y));
       Stop stop = new Stop();
-      stop.name = Game.loginName;
-      stop.position = players.get(Game.loginName).getPosition();
+      stop.name = ErnestGame.loginName;
+      stop.position = players.get(ErnestGame.loginName).getPosition();
       client.sendUDP(stop);
       
     //Right arrow
     } else if (keycode == 22) {
-      players.get(Game.loginName).setVelocity(new Vector2(0, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(0, players.get(ErnestGame.loginName).getVelocity().y));
       Stop stop = new Stop();
-      stop.name = Game.loginName;
-      stop.position = players.get(Game.loginName).getPosition();
+      stop.name = ErnestGame.loginName;
+      stop.position = players.get(ErnestGame.loginName).getPosition();
       client.sendUDP(stop);
     }
 
@@ -105,22 +105,22 @@ public class Controller implements InputProcessor {
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
     // Gdx.app.log("Cursor" + pointer, screenX + ", " + screenY);
     if (screenX <= 400 && screenY > 240) {
-      players.get(Game.loginName).setVelocity(new Vector2(-3.0f, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(-3.0f, players.get(ErnestGame.loginName).getVelocity().y));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
     } else if (screenX >= 400 && screenY > 240) {
-      players.get(Game.loginName).setVelocity(new Vector2(3.0f, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(3.0f, players.get(ErnestGame.loginName).getVelocity().y));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
     } else if (screenY < 240) {
-      players.get(Game.loginName).setVelocity(new Vector2(players.get(Game.loginName).getVelocity().x, 8.5f));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(players.get(ErnestGame.loginName).getVelocity().x, 8.5f));
       Move move = new Move();
-      move.name = Game.loginName;
-      move.velocity = players.get(Game.loginName).getVelocity();
+      move.name = ErnestGame.loginName;
+      move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
     }
 
@@ -130,16 +130,16 @@ public class Controller implements InputProcessor {
   @Override
   public boolean touchUp(int screenX, int screenY, int pointer, int button) {
     if (screenX <= 400 && screenY > 240) {
-      players.get(Game.loginName).setVelocity(new Vector2(0, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(0, players.get(ErnestGame.loginName).getVelocity().y));
       Stop stop = new Stop();
-      stop.name = Game.loginName;
-      stop.position = players.get(Game.loginName).getPosition();
+      stop.name = ErnestGame.loginName;
+      stop.position = players.get(ErnestGame.loginName).getPosition();
       client.sendUDP(stop);
     } else if (screenX >= 400 && screenY > 240) {
-      players.get(Game.loginName).setVelocity(new Vector2(0, players.get(Game.loginName).getVelocity().y));
+      players.get(ErnestGame.loginName).setVelocity(new Vector2(0, players.get(ErnestGame.loginName).getVelocity().y));
       Stop stop = new Stop();
-      stop.name = Game.loginName;
-      stop.position = players.get(Game.loginName).getPosition();
+      stop.name = ErnestGame.loginName;
+      stop.position = players.get(ErnestGame.loginName).getPosition();
       client.sendUDP(stop);
     }
     return false;
