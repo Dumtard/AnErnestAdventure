@@ -76,11 +76,8 @@ public class View {
                                player.getValue().getPosition().y);
       player2Sprite.draw(batch);
     }
-    playerSprite.setPosition(players.get("kokiri").getPosition().x,
-        players.get("kokiri").getPosition().y);
-    
-    /*System.out.println(players.get("kokiri").getPosition().x + ", " +
-        players.get("kokiri").getPosition().y);*/
+    playerSprite.setPosition(players.get("dumtard").getPosition().x,
+        players.get("dumtard").getPosition().y);
     
     playerSprite.draw(batch);
     sprite.draw(batch);

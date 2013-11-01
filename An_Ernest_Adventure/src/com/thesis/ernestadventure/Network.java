@@ -11,14 +11,19 @@ public class Network {
 	// This registers objects that are going to be sent over the network.
 	static public void register (EndPoint endPoint) {
 		Kryo kryo = endPoint.getKryo();
-		kryo.register(Login.class);
+		kryo.register(Connect.class);
+		kryo.register(Disconnect.class);
 		kryo.register(Vector2.class);
 		kryo.register(Move.class);
 		kryo.register(Stop.class);
 	}
 
-	static public class Login {
+	static public class Connect {
 		public String name;
+	}
+	
+	static public class Disconnect {
+	  public String name;
 	}
 	
 	static public class Move {

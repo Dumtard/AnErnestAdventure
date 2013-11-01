@@ -2,7 +2,6 @@ package com.thesis.ernestadventure;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -10,7 +9,8 @@ import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.thesis.ernestadventure.Network.Login;
+import com.thesis.ernestadventure.Network.Connect;
+import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Stop;
 
@@ -22,7 +22,7 @@ public class Game implements ApplicationListener {
   private Controller controller;
   private View view;
 
-  public static final String loginName = "kokiri";
+  public static final String loginName = "dumtard";
   
   @Override
   public void create() {
@@ -31,15 +31,18 @@ public class Game implements ApplicationListener {
     client = new Client();
     client.start();
     Network.register(client);
-
-    
-    
+   
     client.addListener(new Listener() {
       public void received(Connection c, Object object) {
-        if (object instanceof Login) {
-          System.out.println(((Login) object).name + " has joined");
-          players.put(((Login)object).name, new Player());
+        if (object instanceof Connect) {
+          System.out.println(((Connect) object).name + " has joined");
+          players.put(((Connect) object).name, new Player());
 
+          return;
+        } else if (object instanceof Disconnect) {
+          System.out.println(((Disconnect) object).name + " has left");
+          players.remove(((Disconnect) object).name);
+          
           return;
         } else if (object instanceof Move) {
           System.out.println(((Move) object).name + ": " + ((Move) object).velocity.x + ", "
@@ -63,7 +66,7 @@ public class Game implements ApplicationListener {
     try {
       client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
 //    client.connect(5000, "10.121.109.105", 54555, 54555); // Use this for android
-//    client.connect(5000, client.discoverHost(54777, 5000), 54555, 54777); // This doesn't work currently
+//    client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
     } catch (IOException ex) {
       ex.printStackTrace();
     }
@@ -71,7 +74,7 @@ public class Game implements ApplicationListener {
     controller = new Controller(client, players);
     view = new View(players);
     
-    Login login = new Login();
+    Connect login = new Connect();
     login.name = Game.loginName;
 
     client.sendTCP(login);
@@ -80,9 +83,6 @@ public class Game implements ApplicationListener {
   @Override
   public void dispose() {
     view.dispose();
-//    for (Map.Entry<String, Player> player: players.entrySet()) {
-//      player.getValue().dispose();
-//    }
   }
 
   @Override
