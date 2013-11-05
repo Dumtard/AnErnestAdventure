@@ -65,7 +65,7 @@ public class GameScreen implements Screen {
     
     try {
 //      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
-      client.connect(5000, "10.101.244.67", 54555, 54555); // Use this for android
+      client.connect(5000, "10.100.242.174", 54555, 54555); // Use this for android
 //      client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
     } catch (IOException ex) {
       ex.printStackTrace();

@@ -96,20 +96,16 @@ public class View {
     batch.setProjectionMatrix(camera.combined);
     batch.begin();
     for (Map.Entry<String, Player> player: players.entrySet()) {
-//      player.getValue().draw(batch);
-//      player2Sprite.setPosition(player.getValue().getPosition().x,
-//                               player.getValue().getPosition().y);
-//      player2Sprite.draw(batch);
+      TextureRegion bobFrame = walkAnimation.getKeyFrame(time, true);
+      batch.draw(bobFrame, player.getValue().getPosition().x, player.getValue().getPosition().y, 32, 64);
     }
-//    playerSprite.setPosition(players.get("dumtard").getPosition().x,
-//        players.get("dumtard").getPosition().y);
-//    
-//    playerSprite.draw(batch);
-    time += delta;
-    
+    // Ensure player 1 is always visible
     TextureRegion bobFrame = walkAnimation.getKeyFrame(time, true);
-    batch.draw(bobFrame, players.get("dumtard").getPosition().x, players.get("dumtard").getPosition().y, 32, 64);
-    
+    batch.draw(bobFrame, players.get(ErnestGame.loginName).getPosition().x, 
+                         players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+
+    time += delta;
+
     sprite.draw(batch);
     batch.end();
   }
