@@ -82,7 +82,7 @@ public class GameScreen implements Screen {
     Gdx.gl.glClearColor(0, 0, 0, 1);
     Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
     
-    controller.update();
+    controller.update(delta);
     view.render(delta);
   }
 

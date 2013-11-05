@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -44,12 +42,14 @@ public class View {
     width = Gdx.graphics.getWidth();
     height = Gdx.graphics.getHeight();
     
+    float aspectRatio = 480f/height;
+    
     batch = new SpriteBatch();
     
     this.players = players;
     
-    camera = new OrthographicCamera(width, height);
-    camera.translate(width / 2, height / 2);
+    camera = new OrthographicCamera(width*aspectRatio, 480);
+    camera.translate((width*aspectRatio) / 2, 480 / 2);
     
     playerTexture = new Texture(Gdx.files.internal("data/ernest.png"));
     playerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -68,7 +68,7 @@ public class View {
     TextureRegion region = new TextureRegion(texture, 0, 0, 800, 96);
 
     sprite = new Sprite(region);
-    sprite.setPosition(0, 0);
+    sprite.setPosition(0, 480);
     
     loadTextures();
   }
