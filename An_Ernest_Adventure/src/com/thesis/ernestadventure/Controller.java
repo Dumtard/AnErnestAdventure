@@ -22,14 +22,16 @@ public class Controller implements InputProcessor {
     this.client = client;
   }
 
-  public void update() {
+  public void update(float delta) {
+    
+    //TODO Remove magic number '32'
     for (Map.Entry<String, Player> player: players.entrySet()) {
       //Apply Gravity
       player.getValue().setVelocity(player.getValue().getVelocity().x, player.getValue().getVelocity().y - GRAVITY);
       
       //Update Player location
-      player.getValue().setPosition(player.getValue().getPosition().x + player.getValue().getVelocity().x,
-          player.getValue().getPosition().y + player.getValue().getVelocity().y);
+      player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * 32),
+          player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * 32));
       
       //Collision
       if (player.getValue().getPosition().y <= 96) {
