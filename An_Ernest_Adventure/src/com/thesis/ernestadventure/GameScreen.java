@@ -17,12 +17,15 @@ import com.thesis.ernestadventure.Network.Stop;
 public class GameScreen implements Screen {
   private HashMap<String, Player> players = new HashMap<String, Player>();
 
+  public static final int GAMEHEIGHT = 480;
+  
   private Controller controller;
   private View view;
   
   private Client client;
   
   public GameScreen() {
+    
     players.put(ErnestGame.loginName, new Player());
     
     client = new Client();
@@ -65,7 +68,7 @@ public class GameScreen implements Screen {
     
     try {
 //      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
-      client.connect(5000, "10.100.242.174", 54555, 54555); // Use this for android
+      client.connect(5000, "99.252.185.102", 54555, 54555); // Use this for android
 //      client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
     } catch (IOException ex) {
       ex.printStackTrace();

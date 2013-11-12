@@ -1,0 +1,15 @@
+d::0:application/unknown
+d:data:0:application/unknown
+t:data/ernest.pack:538:application/unknown
+i:data/ernest.png:61132:image/png
+i:data/Frame-0.png:361:image/png
+i:data/Frame-1.png:352:image/png
+i:data/Frame-2.png:323:image/png
+i:data/Frame-3.png:351:image/png
+i:data/libgdx.png:54931:image/png
+t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:5043:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl:8738:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl:549:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl:2687:application/unknown
+t:com/badlogic/gdx/utils/arial-15.fnt:21743:application/unknown
+i:com/badlogic/gdx/utils/arial-15.png:21814:image/png
