@@ -9,6 +9,8 @@ import com.badlogic.gdx.files.FileHandle;
 public class Area {
   String tileset;
   Tile[][] tiles;
+  int width = 0;
+  int height = 0;
   
   public Area() throws IOException {
     FileHandle handle;
@@ -16,7 +18,6 @@ public class Area {
     BufferedReader reader = handle.reader(65535);
 
     String line;
-    int width = 0, height = 0;
     while ((line = reader.readLine()) != null) {
       
       String[] lineSplit;
@@ -48,9 +49,9 @@ public class Area {
         if (line.equals("Middle:")) {
           line = reader.readLine();
           
-          for (int i = 0; i < height; i++) {
+          for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, (GameScreen.GAMEHEIGHT-Tile.SIZE)-(i*Tile.SIZE));
+              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, /*(GameScreen.GAMEHEIGHT-Tile.SIZE)-*/(i*Tile.SIZE));
             }
             line = reader.readLine();
           }
@@ -68,7 +69,7 @@ public class Area {
         if (line.equals("Collision:")) {
           line = reader.readLine();
           
-          for (int i = 0; i < height; i++) {
+          for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
               if (line.charAt(j) == '#') {
                 tiles[j][i].collidable = true;

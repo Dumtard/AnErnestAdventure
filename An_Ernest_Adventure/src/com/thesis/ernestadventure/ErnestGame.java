@@ -6,7 +6,7 @@ import com.badlogic.gdx.Game;
 
 public class ErnestGame extends Game {
 
-  public static final String loginName = "dumtard";
+  public static final String loginName = "kokiri";
 
   @Override
   public void create() {

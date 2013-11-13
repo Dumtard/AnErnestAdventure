@@ -22,6 +22,8 @@ public class GameScreen implements Screen {
   private Controller controller;
   private View view;
   
+  private Area area;
+  
   private Client client;
   
   public GameScreen() {
@@ -29,8 +31,13 @@ public class GameScreen implements Screen {
     players.put(ErnestGame.loginName, new Player());
     
     client = new Client();
-    controller = new Controller(client, players);
-    view = new View(players);
+    try {
+      area = new Area();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    controller = new Controller(client, players, area);
+    view = new View(players, area);
     
     client.start();
     Network.register(client);

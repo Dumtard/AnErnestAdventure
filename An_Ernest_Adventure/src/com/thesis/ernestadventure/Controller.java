@@ -16,10 +16,13 @@ public class Controller implements InputProcessor {
   private HashMap<String, Player>  players;
   private Client client;
 
-  public Controller(Client client, HashMap<String, Player> players) {
+  private Area area;
+  
+  public Controller(Client client, HashMap<String, Player> players, Area area) {
     Gdx.input.setInputProcessor(this);
     this.players = players;
     this.client = client;
+    this.area = area;
   }
 
   public void update(float delta) {
@@ -30,14 +33,36 @@ public class Controller implements InputProcessor {
       player.getValue().setVelocity(player.getValue().getVelocity().x, player.getValue().getVelocity().y - GRAVITY);
       
       //Update Player location
-      player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * 32),
-          player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * 32));
+      player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * Tile.SIZE),
+          player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * Tile.SIZE));
       
       //Collision
-      if (player.getValue().getPosition().y <= 96) {
-        player.getValue().setPosition(player.getValue().getPosition().x, 96);
-        player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+      int tilePositionX = (int)((player.getValue().getPosition().x + Tile.SIZE/2) / Tile.SIZE);
+      int tilePositionY = (int)(player.getValue().getPosition().y / Tile.SIZE);
+      if (tilePositionX >= 0 && tilePositionX < area.width &&
+          tilePositionY >= 0 && tilePositionY < area.height) {
+        if (area.tiles[tilePositionX][tilePositionY].collidable) {
+          player.getValue().setPosition(player.getValue().getPosition().x, ((tilePositionY+1)*Tile.SIZE));
+          player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+        }
+        if (area.tiles[(int)((player.getValue().getPosition().x + Tile.SIZE)/Tile.SIZE)][tilePositionY+1].collidable) {
+          player.getValue().setPosition(tilePositionX*Tile.SIZE, player.getValue().getPosition().y);
+          player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+        }
+        if (area.tiles[(int)((player.getValue().getPosition().x)/Tile.SIZE)][tilePositionY+1].collidable) {
+          player.getValue().setPosition((tilePositionX)*Tile.SIZE, player.getValue().getPosition().y);
+          player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+        }
+        if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
+          player.getValue().setPosition(player.getValue().getPosition().x, ((tilePositionY)*Tile.SIZE));
+          player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+        }
       }
+      
+//      if (player.getValue().getPosition().y <= 96) {
+//        player.getValue().setPosition(player.getValue().getPosition().x, Tile.SIZE*3);
+//        player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+//      }
     }
   }
   

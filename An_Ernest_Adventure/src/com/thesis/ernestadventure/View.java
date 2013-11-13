@@ -35,7 +35,7 @@ public class View {
   private Sprite sprite2;
   private Sprite sprite3;
   
-  Area area;
+  private Area area;
   
   private float time = 0.0f;
   
@@ -45,13 +45,8 @@ public class View {
   /** Animations **/
   private Animation walkAnimation;
   
-  public View(HashMap<String, Player> players) {
-    //TODO Refactor
-    try {
-      area = new Area();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public View(HashMap<String, Player> players, Area area) {
+    this.area = area;
     
     width = Gdx.graphics.getWidth();
     height = Gdx.graphics.getHeight();
@@ -105,8 +100,8 @@ public class View {
           sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite1.draw(batch);
         } else if (area.tiles[j][i].id == 46) {
-          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-          sprite2.draw(batch);
+//          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+//          sprite2.draw(batch);
         } else {
           sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite3.draw(batch);

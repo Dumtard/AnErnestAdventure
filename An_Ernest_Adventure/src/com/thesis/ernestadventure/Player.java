@@ -7,7 +7,7 @@ public class Player {
   private Vector2 velocity;
 
   public Player() {
-    position = new Vector2(0, 500);
+    position = new Vector2(100, 300);
     velocity = new Vector2(0, 0);
   }
 
