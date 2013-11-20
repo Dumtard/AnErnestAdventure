@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.esotericsoftware.kryonet.Client;
 import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Stop;
@@ -18,11 +20,14 @@ public class Controller implements InputProcessor {
 
   private Area area;
   
-  public Controller(Client client, HashMap<String, Player> players, Area area) {
+  private OrthographicCamera camera;
+  
+  public Controller(Client client, HashMap<String, Player> players, Area area, OrthographicCamera camera) {
     Gdx.input.setInputProcessor(this);
     this.players = players;
     this.client = client;
     this.area = area;
+    this.camera = camera;
   }
 
   public void update(float delta) {
@@ -58,6 +63,41 @@ public class Controller implements InputProcessor {
           player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
         }
       }
+      
+      camera.position.set(player.getValue().getPosition().x,
+                          player.getValue().getPosition().y,
+                          camera.position.z);
+      
+//      if (abs(level.x-player.x) > screenWidth && lower bound too)
+      
+        if (player.getValue().getPosition().x > area.width*Tile.SIZE - (camera.viewportWidth/2)) {
+          camera.position.set(area.width*Tile.SIZE - (camera.viewportWidth/2),
+              camera.position.y,
+              camera.position.z);
+        } else if (player.getValue().getPosition().x < (camera.viewportWidth/2)) {
+          camera.position.set((camera.viewportWidth/2),
+              camera.position.y,
+              camera.position.z);
+        }
+        
+        if (player.getValue().getPosition().y > area.height*Tile.SIZE - (camera.viewportHeight/2)) {
+          camera.position.set(camera.position.x,
+              area.height*Tile.SIZE - (camera.viewportHeight/2),
+              camera.position.z);
+        } else if (player.getValue().getPosition().y < (camera.viewportHeight/2)) {
+          camera.position.set(camera.position.x,
+              (camera.viewportHeight/2),
+              camera.position.z);
+        }
+      
+//      Vector2 cameraPosition = player.getValue().getVelocity();
+////      cameraPosition.x -= Gdx.graphics.getWidth();
+////      cameraPosition.y -= Gdx.graphics.getHeight();
+//      camera.translate(cameraPosition);
+      
+//      Gdx.app.log(camera.position.x + "", camera.position.y + "");
+      
+                            
       
 //      if (player.getValue().getPosition().y <= 96) {
 //        player.getValue().setPosition(player.getValue().getPosition().x, Tile.SIZE*3);

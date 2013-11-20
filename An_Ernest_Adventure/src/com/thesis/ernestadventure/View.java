@@ -1,13 +1,10 @@
 package com.thesis.ernestadventure;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,15 +19,17 @@ public class View {
   private SpriteBatch batch;
   
   private HashMap<String, Player> players;
-
-//  private Texture playerTexture;
-//  private Sprite playerSprite;
-//  private Sprite player2Sprite;
+  
+  UI_View UIView;
+  
   
   private TextureAtlas tileAtlas;
   
-  //TODO Remove these textures and sprites
-  private Texture texture;
+  //TODO Change naming
+  TextureAtlas atlas;
+
+
+  //TODO Think about moving
   private Sprite sprite1;
   private Sprite sprite2;
   private Sprite sprite3;
@@ -60,6 +59,8 @@ public class View {
     camera = new OrthographicCamera(width*aspectRatio, 480);
     camera.translate((width*aspectRatio) / 2, 480 / 2);
     
+    UIView = new UI_View(batch);
+    
     tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.pack"));
     
     sprite1 = new Sprite();
@@ -70,15 +71,15 @@ public class View {
     sprite2 = tileAtlas.createSprite("TileDot");
     sprite3 = tileAtlas.createSprite("Tile@");
     
-    //TODO Remove this
-    texture = new Texture(Gdx.files.internal("tiles/tiles.png"));
-    texture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-    
     loadTextures();
   }
   
+  public OrthographicCamera getCamera() {
+    return camera;
+  }
+  
   private void loadTextures() {
-    TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("data/ernest.pack"));
+    atlas = new TextureAtlas(Gdx.files.internal("data/ernest.pack"));
     ernestIdle = atlas.findRegion("Frame-0");
     TextureRegion[] walkFrames = new TextureRegion[4];
     for (int i = 0; i < 4; i++) {
@@ -89,13 +90,12 @@ public class View {
   
   public void dispose() {
     batch.dispose();
-    texture.dispose();
 //    playerTexture.dispose();
   }
   
   private void renderArea(float delta) {
-    for (int i = 0; i < area.tiles.length; i++) {
-      for (int j = 0; j < area.tiles[i].length; j++) {
+    for (int i = 0; i < area.height; i++) {
+      for (int j = 0; j < area.width; j++) {
         if (area.tiles[j][i].id == 35) {
           sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite1.draw(batch);
@@ -121,6 +121,13 @@ public class View {
                          players.get(ErnestGame.loginName).getPosition().y, 32, 64);
   }
   
+  private void renderUI() {
+    UIView.render(camera.position.x - (camera.viewportWidth/2.0f),
+                  camera.position.y - (camera.viewportHeight/2.0f),
+                  camera.viewportWidth,
+                  camera.viewportHeight*(3.0f/15.0f));
+  }
+  
   public void render(float delta) {
     
     camera.update();
@@ -130,6 +137,7 @@ public class View {
     
     renderArea(delta);
     renderPlayers(delta);
+    renderUI();
     
     time += delta;
     

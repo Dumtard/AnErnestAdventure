@@ -36,8 +36,8 @@ public class GameScreen implements Screen {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    controller = new Controller(client, players, area);
     view = new View(players, area);
+    controller = new Controller(client, players, area, view.getCamera());
     
     client.start();
     Network.register(client);
