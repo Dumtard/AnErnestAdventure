@@ -1,7 +1,5 @@
 package com.thesis.ernestadventure;
 
-import java.io.IOException;
-
 import com.badlogic.gdx.Game;
 
 public class ErnestGame extends Game {

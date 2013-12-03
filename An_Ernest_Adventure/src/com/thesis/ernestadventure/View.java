@@ -21,15 +21,8 @@ public class View {
   private HashMap<String, Player> players;
   
   UI_View UIView;
-  
-  
-  private TextureAtlas tileAtlas;
-  
-  //TODO Change naming
-  TextureAtlas atlas;
 
-
-  //TODO Think about moving
+  //TODO Array?
   private Sprite sprite1;
   private Sprite sprite2;
   private Sprite sprite3;
@@ -39,10 +32,10 @@ public class View {
   private float time = 0.0f;
   
   /** Textures **/
-  private TextureRegion ernestIdle;
   
   /** Animations **/
   private Animation walkAnimation;
+  private Animation idleAnimation;
   
   public View(HashMap<String, Player> players, Area area) {
     this.area = area;
@@ -61,7 +54,7 @@ public class View {
     
     UIView = new UI_View(batch);
     
-    tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.pack"));
+    TextureAtlas tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.pack"));
     
     sprite1 = new Sprite();
     sprite2 = new Sprite();
@@ -79,12 +72,18 @@ public class View {
   }
   
   private void loadTextures() {
-    atlas = new TextureAtlas(Gdx.files.internal("data/ernest.pack"));
-    ernestIdle = atlas.findRegion("Frame-0");
+    TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("data/packed/ernest.pack"));
+    
+    TextureRegion[] idleFrames = new TextureRegion[2];
+    for (int i = 0; i < 2; i++) {
+      idleFrames[i] = atlas.findRegion("Idle-" + i); 
+    }
+    
     TextureRegion[] walkFrames = new TextureRegion[4];
     for (int i = 0; i < 4; i++) {
       walkFrames[i] = atlas.findRegion("Frame-" + i);
     }
+    idleAnimation = new Animation(0.5f, idleFrames);
     walkAnimation = new Animation(0.13f, walkFrames);
   }
   
@@ -100,6 +99,8 @@ public class View {
           sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite1.draw(batch);
         } else if (area.tiles[j][i].id == 46) {
+          sprite2.setPosition(-100, -100);
+          sprite2.draw(batch);
 //          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
 //          sprite2.draw(batch);
         } else {
@@ -111,14 +112,83 @@ public class View {
   }
   
   private void renderPlayers(float delta) {
+    // Loops through all players and renders them
+    // Skips player 1 - Player 1 drawn afterwards to always be on top
     for (Map.Entry<String, Player> player: players.entrySet()) {
-      TextureRegion bobFrame = walkAnimation.getKeyFrame(time, true);
-      batch.draw(bobFrame, player.getValue().getPosition().x, player.getValue().getPosition().y, 32, 64);
+      if (!player.getKey().equals(ErnestGame.loginName)) {
+        if (player.getValue().getVelocity().x != 0 &&
+            player.getValue().getVelocity().y == 0) {
+          if (player.getValue().getVelocity().x > 0) {
+            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+            batch.draw(currentFrame, player.getValue().getPosition().x,
+                                     player.getValue().getPosition().y, 32, 64);
+          } else {
+            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+            currentFrame.flip(true, false);
+            batch.draw(currentFrame, player.getValue().getPosition().x,
+                                     player.getValue().getPosition().y, 32, 64);
+          }
+        } else if ((player.getValue().getVelocity().x != 0 &&
+                    player.getValue().getVelocity().y != 0) ||
+                   (player.getValue().getVelocity().x == 0 &&
+                    player.getValue().getVelocity().y != 0)) {
+          if (player.getValue().getVelocity().x > 0) {
+            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+            batch.draw(currentFrame, player.getValue().getPosition().x,
+                                     player.getValue().getPosition().y, 32, 64);
+          } else {
+            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+            currentFrame.flip(true, false);
+            batch.draw(currentFrame, player.getValue().getPosition().x,
+                                     player.getValue().getPosition().y, 32, 64);
+          }
+        } else {
+          TextureRegion currentFrame = idleAnimation.getKeyFrame(time, true);
+          batch.draw(currentFrame, player.getValue().getPosition().x,
+                                   player.getValue().getPosition().y, 32, 64);
+        }
+      }
     }
+
     // Ensure player 1 is always visible
-    TextureRegion bobFrame = walkAnimation.getKeyFrame(time, true);
-    batch.draw(bobFrame, players.get(ErnestGame.loginName).getPosition().x, 
-                         players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+    if (players.get(ErnestGame.loginName).getVelocity().x != 0 &&
+        players.get(ErnestGame.loginName).getIsGrounded()) { 
+      if (players.get(ErnestGame.loginName).getIsFacingRight()) {
+        Gdx.app.log("Direction", "Right");
+        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+        if (currentFrame.isFlipX()) {
+          currentFrame.flip(true, false);
+        }
+        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
+                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+      } else {
+        Gdx.app.log("Direction", "Left");
+        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+        if (!currentFrame.isFlipX()) {
+          currentFrame.flip(true, false);
+        }
+        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
+                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+      }
+    } else if ((players.get(ErnestGame.loginName).getVelocity().x != 0 &&
+                !players.get(ErnestGame.loginName).getIsGrounded()) ||
+               (players.get(ErnestGame.loginName).getVelocity().x == 0 &&
+                !players.get(ErnestGame.loginName).getIsGrounded())) {
+      if (players.get(ErnestGame.loginName).getIsFacingRight()) {
+        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
+                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+      } else {
+        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
+        currentFrame.flip(true, false);
+        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
+                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+      }
+    } else {
+      TextureRegion currentFrame = idleAnimation.getKeyFrame(time, true);
+      batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
+                               players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+    }
   }
   
   private void renderUI() {

@@ -3,37 +3,51 @@ ernest.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-libgdx
+ernest
   rotate: false
-  xy: 1, 133
-  size: 512, 512
-  orig: 512, 512
+  xy: 1, 67
+  size: 256, 128
+  orig: 256, 128
   offset: 0, 0
   index: -1
 Frame-0
-  rotate: false
-  xy: 1, 67
-  size: 32, 64
-  orig: 32, 64
-  offset: 0, 0
-  index: -1
-Frame-1
-  rotate: false
-  xy: 515, 581
-  size: 32, 64
-  orig: 32, 64
-  offset: 0, 0
-  index: -1
-Frame-2
   rotate: false
   xy: 1, 1
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
   index: -1
+Frame-1
+  rotate: false
+  xy: 259, 131
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Frame-2
+  rotate: false
+  xy: 35, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
 Frame-3
   rotate: false
-  xy: 35, 67
+  xy: 293, 131
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Idle-0
+  rotate: false
+  xy: 69, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Idle-1
+  rotate: false
+  xy: 327, 131
   size: 32, 64
   orig: 32, 64
   offset: 0, 0

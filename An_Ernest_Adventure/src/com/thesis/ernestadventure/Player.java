@@ -5,10 +5,15 @@ import com.badlogic.gdx.math.Vector2;
 public class Player {
   private Vector2 position;
   private Vector2 velocity;
+  
+  private boolean isGrounded;
+  private boolean isFacingRight;
 
   public Player() {
     position = new Vector2(100, 300);
     velocity = new Vector2(0, 0);
+    isGrounded = false;
+    isFacingRight = true;
   }
 
   public Vector2 getPosition() {
@@ -33,5 +38,21 @@ public class Player {
 
   public void setVelocity(Vector2 velocity) {
     this.velocity.set(velocity);
+  }
+  
+  public void setIsGrounded(boolean isGrounded) {
+    this.isGrounded = isGrounded;
+  }
+  
+  public boolean getIsGrounded() {
+    return this.isGrounded;
+  }
+  
+  public void setIsFacingRight(boolean isFacingRight) {
+    this.isFacingRight = isFacingRight;
+  }
+  
+  public boolean getIsFacingRight() {
+    return this.isFacingRight;
   }
 }
