@@ -15,29 +15,33 @@ import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class GameScreen implements Screen {
-  private HashMap<String, Player> players = new HashMap<String, Player>();
-
   public static final int GAMEHEIGHT = 480;
   
   private Controller controller;
   private View view;
   
-  private Area area;
-  
   private Client client;
   
+  private UI ui;
+  private HashMap<String, Player> players;
+//  private ArrayList<Enemy> enemies;
+
+  private Area area;
+
   public GameScreen() {
-    
-    players.put(ErnestGame.loginName, new Player());
-    
+    ui = new UI();
     client = new Client();
     try {
       area = new Area();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    view = new View(players, area);
-    controller = new Controller(client, players, area, view.getCamera());
+    
+    players = new HashMap<String, Player>();
+    players.put(ErnestGame.loginName, new Player());
+    
+    view = new View(ui, players, area);
+    controller = new Controller(client, ui, players, area);
     
     client.start();
     Network.register(client);
@@ -94,6 +98,9 @@ public class GameScreen implements Screen {
     
     controller.update(delta);
     view.render(delta);
+    
+    ErnestGame.GAMETIME += delta;
+    
   }
 
   @Override

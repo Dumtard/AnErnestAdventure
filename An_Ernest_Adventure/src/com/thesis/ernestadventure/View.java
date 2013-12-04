@@ -1,216 +1,47 @@
 package com.thesis.ernestadventure;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class View {
-  private int width;
-  private int height;
+  private UIView uiView;
+  private GameView gameView;
   
   private OrthographicCamera camera;
   private SpriteBatch batch;
   
-  private HashMap<String, Player> players;
-  
-  UI_View UIView;
-
-  //TODO Array?
-  private Sprite sprite1;
-  private Sprite sprite2;
-  private Sprite sprite3;
-  
-  private Area area;
-  
-  private float time = 0.0f;
-  
-  /** Textures **/
-  
-  /** Animations **/
-  private Animation walkAnimation;
-  private Animation idleAnimation;
-  
-  public View(HashMap<String, Player> players, Area area) {
-    this.area = area;
-    
-    width = Gdx.graphics.getWidth();
-    height = Gdx.graphics.getHeight();
+  public View(UI ui, HashMap<String, Player> players, Area area) {
+    int width = Gdx.graphics.getWidth();
+    int height = Gdx.graphics.getHeight();
     
     float aspectRatio = 480f/height;
     
+    camera = new OrthographicCamera(width * aspectRatio, 480);
+    camera.translate((width * aspectRatio) / 2, 480 / 2);
+
     batch = new SpriteBatch();
     
-    this.players = players;
-    
-    camera = new OrthographicCamera(width*aspectRatio, 480);
-    camera.translate((width*aspectRatio) / 2, 480 / 2);
-    
-    UIView = new UI_View(batch);
-    
-    TextureAtlas tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.pack"));
-    
-    sprite1 = new Sprite();
-    sprite2 = new Sprite();
-    sprite3 = new Sprite();
-    
-    sprite1 = tileAtlas.createSprite("Tile#");
-    sprite2 = tileAtlas.createSprite("TileDot");
-    sprite3 = tileAtlas.createSprite("Tile@");
-    
-    loadTextures();
-  }
-  
-  public OrthographicCamera getCamera() {
-    return camera;
-  }
-  
-  private void loadTextures() {
-    TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("data/packed/ernest.pack"));
-    
-    TextureRegion[] idleFrames = new TextureRegion[2];
-    for (int i = 0; i < 2; i++) {
-      idleFrames[i] = atlas.findRegion("Idle-" + i); 
-    }
-    
-    TextureRegion[] walkFrames = new TextureRegion[4];
-    for (int i = 0; i < 4; i++) {
-      walkFrames[i] = atlas.findRegion("Frame-" + i);
-    }
-    idleAnimation = new Animation(0.5f, idleFrames);
-    walkAnimation = new Animation(0.13f, walkFrames);
+    uiView = new UIView(ui, batch, camera);
+    gameView = new GameView(batch, camera, players, area);
   }
   
   public void dispose() {
     batch.dispose();
-//    playerTexture.dispose();
   }
-  
-  private void renderArea(float delta) {
-    for (int i = 0; i < area.height; i++) {
-      for (int j = 0; j < area.width; j++) {
-        if (area.tiles[j][i].id == 35) {
-          sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-          sprite1.draw(batch);
-        } else if (area.tiles[j][i].id == 46) {
-          sprite2.setPosition(-100, -100);
-          sprite2.draw(batch);
-//          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-//          sprite2.draw(batch);
-        } else {
-          sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-          sprite3.draw(batch);
-        }
-      }
-    }
-  }
-  
-  private void renderPlayers(float delta) {
-    // Loops through all players and renders them
-    // Skips player 1 - Player 1 drawn afterwards to always be on top
-    for (Map.Entry<String, Player> player: players.entrySet()) {
-      if (!player.getKey().equals(ErnestGame.loginName)) {
-        if (player.getValue().getVelocity().x != 0 &&
-            player.getValue().getVelocity().y == 0) {
-          if (player.getValue().getVelocity().x > 0) {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-            batch.draw(currentFrame, player.getValue().getPosition().x,
-                                     player.getValue().getPosition().y, 32, 64);
-          } else {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-            currentFrame.flip(true, false);
-            batch.draw(currentFrame, player.getValue().getPosition().x,
-                                     player.getValue().getPosition().y, 32, 64);
-          }
-        } else if ((player.getValue().getVelocity().x != 0 &&
-                    player.getValue().getVelocity().y != 0) ||
-                   (player.getValue().getVelocity().x == 0 &&
-                    player.getValue().getVelocity().y != 0)) {
-          if (player.getValue().getVelocity().x > 0) {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-            batch.draw(currentFrame, player.getValue().getPosition().x,
-                                     player.getValue().getPosition().y, 32, 64);
-          } else {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-            currentFrame.flip(true, false);
-            batch.draw(currentFrame, player.getValue().getPosition().x,
-                                     player.getValue().getPosition().y, 32, 64);
-          }
-        } else {
-          TextureRegion currentFrame = idleAnimation.getKeyFrame(time, true);
-          batch.draw(currentFrame, player.getValue().getPosition().x,
-                                   player.getValue().getPosition().y, 32, 64);
-        }
-      }
-    }
 
-    // Ensure player 1 is always visible
-    if (players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-        players.get(ErnestGame.loginName).getIsGrounded()) { 
-      if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-        Gdx.app.log("Direction", "Right");
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-        if (currentFrame.isFlipX()) {
-          currentFrame.flip(true, false);
-        }
-        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-      } else {
-        Gdx.app.log("Direction", "Left");
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-        if (!currentFrame.isFlipX()) {
-          currentFrame.flip(true, false);
-        }
-        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-      }
-    } else if ((players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-                !players.get(ErnestGame.loginName).getIsGrounded()) ||
-               (players.get(ErnestGame.loginName).getVelocity().x == 0 &&
-                !players.get(ErnestGame.loginName).getIsGrounded())) {
-      if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-      } else {
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(time, true);
-        currentFrame.flip(true, false);
-        batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-      }
-    } else {
-      TextureRegion currentFrame = idleAnimation.getKeyFrame(time, true);
-      batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                               players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-    }
-  }
-  
-  private void renderUI() {
-    UIView.render(camera.position.x - (camera.viewportWidth/2.0f),
-                  camera.position.y - (camera.viewportHeight/2.0f),
-                  camera.viewportWidth,
-                  camera.viewportHeight*(3.0f/15.0f));
-  }
-  
   public void render(float delta) {
-    
+    gameView.updateCamera();
     camera.update();
-    
+
     batch.setProjectionMatrix(camera.combined);
     batch.begin();
     
-    renderArea(delta);
-    renderPlayers(delta);
-    renderUI();
-    
-    time += delta;
-    
+    gameView.render(delta);
+    uiView.render(delta);
+
     batch.end();
   }
 }
