@@ -16,6 +16,8 @@ public class UIController {
   }
   
   public void update(float delta) {
-    
+    ui.toString();
+    client.toString();
+    players.toString();
   }
 }
