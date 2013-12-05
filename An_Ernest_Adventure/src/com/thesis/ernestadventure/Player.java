@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Player {
   private Vector2 position;
   private Vector2 velocity;
+  private int width;
+  private int height;
   
   private boolean isGrounded;
   private boolean isFacingRight;
@@ -12,10 +14,20 @@ public class Player {
   public Player() {
     position = new Vector2(100, 300);
     velocity = new Vector2(0, 0);
+    width = 32;
+    height = 64;
     isGrounded = false;
     isFacingRight = true;
   }
 
+  public int getWidth() {
+    return width;
+  }
+  
+  public int getHeight() {
+    return height;
+  }
+  
   public Vector2 getPosition() {
     return position;
   }

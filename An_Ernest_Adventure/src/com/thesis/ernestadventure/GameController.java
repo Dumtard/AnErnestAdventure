@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.thesis.ernestadventure.Network.Move;
@@ -25,130 +26,132 @@ public class GameController {
     this.area = area;
   }
 
-  // public void update(float delta) {
-  // for (Map.Entry<String, Player> player: players.entrySet()) {
-  //
-  // //Apply Gravity
-  // player.getValue().setVelocity(player.getValue().getVelocity().x,
-  // player.getValue().getVelocity().y - GRAVITY);
-  //
-  // int tilePositionX = (int)(player.getValue().getPosition().x / Tile.SIZE);
-  // int tilePositionY = (int)(player.getValue().getPosition().y / Tile.SIZE);
-  //
-  // //Collision
-  // if (tilePositionX >= 0 && tilePositionX < area.width &&
-  // tilePositionY >= 0 && tilePositionY < area.height) {
-  //
-  // player.getValue().setPosition(player.getValue().getPosition().x +
-  // (player.getValue().getVelocity().x * delta * Tile.SIZE),
-  // player.getValue().getPosition().y + (player.getValue().getVelocity().y *
-  // delta * Tile.SIZE));
-  //
-  //
-  // // player.getValue().setPosition(player.getValue().getPosition().x,
-  // // player.getValue().getPosition().y + (player.getValue().getVelocity().y *
-  // delta * Tile.SIZE));
-  //
-  // //Bottom
-  // if (area.tiles[tilePositionX][tilePositionY].collidable) {
-  // player.getValue().setPosition(player.getValue().getPosition().x,
-  // ((tilePositionY+1)*Tile.SIZE));
-  // player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
-  // player.getValue().setIsGrounded(true);
-  //
-  // //Top
-  // } else if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
-  // player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
-  // player.getValue().setPosition(player.getValue().getPosition().x,
-  // (tilePositionY * Tile.SIZE)-1);
-  // }
-  //
-  // player.getValue().setPosition(player.getValue().getPosition().x +
-  // (player.getValue().getVelocity().x * delta * Tile.SIZE),
-  // player.getValue().getPosition().y);
-  //
-  // //Right
-  // // if (area.tiles[tilePositionX+1][tilePositionY].collidable ||
-  // // area.tiles[tilePositionX+1][tilePositionY+1].collidable) {
-  // // player.getValue().setVelocity(0, player.getValue().getVelocity().y);
-  // // player.getValue().setPosition(tilePositionX * Tile.SIZE,
-  // player.getValue().getPosition().y);
-  // //
-  // // //Left
-  // // } else if (area.tiles[tilePositionX][tilePositionY].collidable ||
-  // // area.tiles[tilePositionX][tilePositionY+1].collidable) {
-  // // player.getValue().setVelocity(0, player.getValue().getVelocity().y);
-  // // player.getValue().setPosition(((tilePositionX + 1) * Tile.SIZE)+1,
-  // player.getValue().getPosition().y);
-  // // }
-  //
-  // //Update Player location
-  // // player.getValue().setPosition(player.getValue().getPosition().x +
-  // (player.getValue().getVelocity().x * delta * Tile.SIZE),
-  // // player.getValue().getPosition().y + (player.getValue().getVelocity().y *
-  // delta * Tile.SIZE));
-  //
-  // }
-  // }
-  // }
-
   public void update(float delta) {
-
     for (Map.Entry<String, Player> player : players.entrySet()) {
       // Apply Gravity
       player.getValue().setVelocity(player.getValue().getVelocity().x, player.getValue().getVelocity().y - GRAVITY);
 
+      
+      Rectangle playerRect = new Rectangle(player.getValue().getPosition().x+1, player.getValue().getPosition().y,
+                                           player.getValue().getWidth()-2, player.getValue().getHeight()-2);
+      
       // Collision
-
-      int tilePositionX = 0;
-      int tilePositionY = 0;
-
-      if (tilePositionX >= 0 && tilePositionX < area.width && tilePositionY >= 0 && tilePositionY < area.height) {
-
-        tilePositionX = (int) ((player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * Tile.SIZE)) / Tile.SIZE);
-        tilePositionY = (int) ((player.getValue().getPosition().y) / Tile.SIZE);
+      playerRect.x += player.getValue().getVelocity().x;
+      
+      int tilePositionX = (int) (playerRect.x / Tile.SIZE);
+      int tilePositionY = (int) (playerRect.y / Tile.SIZE);
+      
+      // Right
+      if (playerRect.x > player.getValue().getPosition().x) {
         
-        // Update Player location
-        player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * Tile.SIZE),
-                                      player.getValue().getPosition().y);
+        if (area.tiles[tilePositionX+1][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY].x,
+                                              area.tiles[tilePositionX+1][tilePositionY].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(blockRect.x-Tile.SIZE, playerRect.y);
+            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+          }
+        } else if (area.tiles[tilePositionX+1][tilePositionY+1].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+1].x,
+                                              area.tiles[tilePositionX+1][tilePositionY+1].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
 
-        // Right
-        if (area.tiles[tilePositionX+1][tilePositionY].collidable ||
-            area.tiles[tilePositionX+1][tilePositionY+1].collidable) {
-          player.getValue().setPosition((tilePositionX * Tile.SIZE)-1, player.getValue().getPosition().y);
-          player.getValue().setVelocity(0, player.getValue().getVelocity().y);
-  
-        // Left
-        } else if (area.tiles[tilePositionX][tilePositionY].collidable ||
-                   area.tiles[tilePositionX][tilePositionY+1].collidable) {
-          player.getValue().setPosition(((tilePositionX+1) * Tile.SIZE)+1, player.getValue().getPosition().y);
-          player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(blockRect.x-Tile.SIZE, playerRect.y);
+            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+          }
         }
 
-        tilePositionX = (int) ((player.getValue().getPosition().x) / Tile.SIZE);
-        tilePositionY = (int) ((player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * Tile.SIZE)) / Tile.SIZE);
-        
-        
-        // Update Player location
-        player.getValue().setPosition(player.getValue().getPosition().x,
-                                    player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * Tile.SIZE));
+      // Left
+      } else if (playerRect.x < player.getValue().getPosition().x) {
+        if (area.tiles[tilePositionX][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,
+                                              area.tiles[tilePositionX][tilePositionY].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(blockRect.x+Tile.SIZE, playerRect.y);
+            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+          }
+        } else if (area.tiles[tilePositionX][tilePositionY+1].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+1].x,
+                                              area.tiles[tilePositionX][tilePositionY+1].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
 
-        // Bottom
-        if (area.tiles[tilePositionX][tilePositionY].collidable ||
-            area.tiles[tilePositionX+1][tilePositionY].collidable) {
-          player.getValue().setPosition(player.getValue().getPosition().x, (tilePositionY+1) * Tile.SIZE);
-          player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
-          player.getValue().setIsGrounded(true);
-  
-        // Top
-        } else if (area.tiles[tilePositionX][tilePositionY+2].collidable ||
-                   area.tiles[tilePositionX+1][tilePositionY+2].collidable) {
-          player.getValue().setPosition(player.getValue().getPosition().x, tilePositionY * Tile.SIZE);
-          player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(blockRect.x+Tile.SIZE, playerRect.y);
+            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+          }
         }
-  
-
       }
+
+      playerRect.x = player.getValue().getPosition().x;
+      playerRect.y += player.getValue().getVelocity().y;
+      
+      tilePositionX = (int) (playerRect.x / Tile.SIZE);
+      tilePositionY = (int) (playerRect.y / Tile.SIZE);
+      
+      // Bottom
+      if (playerRect.y < player.getValue().getPosition().y) {
+        if (area.tiles[tilePositionX][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,
+                                              area.tiles[tilePositionX][tilePositionY].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(playerRect.x, blockRect.y+Tile.SIZE);
+            player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+            player.getValue().setIsGrounded(true);
+          }
+        } else if (area.tiles[tilePositionX+1][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY].x,
+                                              area.tiles[tilePositionX+1][tilePositionY].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(playerRect.x, blockRect.y+Tile.SIZE);
+            player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+            player.getValue().setIsGrounded(true);
+          }
+        }
+
+      // Top
+      } else if (playerRect.y > player.getValue().getPosition().y) {
+        if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+2].x,
+                                              area.tiles[tilePositionX][tilePositionY+2].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(playerRect.x, blockRect.y-playerRect.height);
+            player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+          }
+        } else if (area.tiles[tilePositionX+1][tilePositionY+2].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+2].x,
+                                              area.tiles[tilePositionX+1][tilePositionY+2].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+
+          if (playerRect.overlaps(blockRect)) {
+            player.getValue().setPosition(playerRect.x, blockRect.y-playerRect.height);
+            player.getValue().setVelocity(player.getValue().getVelocity().x, 0);
+           }
+        } 
+      }
+      playerRect.y = player.getValue().getPosition().y;
+
+      // Update Player location
+      player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * Tile.SIZE),
+                                    player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * Tile.SIZE));
     }
   }
 

@@ -86,95 +86,57 @@ public class GameView {
     // Skips player 1 - Player 1 drawn afterwards to always be on top
     for (Map.Entry<String, Player> player: players.entrySet()) {
       if (!player.getKey().equals(ErnestGame.loginName)) {
+        Player currentPlayer = player.getValue();
         //Walking animations
-        if (players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-            players.get(ErnestGame.loginName).getIsGrounded()) { 
-          if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-            Gdx.app.log("Direction", "Right");
+        if (currentPlayer.getVelocity().x != 0 &&
+            currentPlayer.getIsGrounded()) { 
+          if (currentPlayer.getIsFacingRight()) {
             TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             if (currentFrame.isFlipX()) {
               currentFrame.flip(true, false);
             }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+            batch.draw(currentFrame, currentPlayer.getPosition().x,
+                                     currentPlayer.getPosition().y,
+                                     currentPlayer.getWidth(),
+                                     currentPlayer.getHeight());
           } else {
-            Gdx.app.log("Direction", "Left");
             TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             if (!currentFrame.isFlipX()) {
               currentFrame.flip(true, false);
             }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+            batch.draw(currentFrame, currentPlayer.getPosition().x,
+                                     currentPlayer.getPosition().y,
+                                     currentPlayer.getWidth(),
+                                     currentPlayer.getHeight());
           }
         
         //Jumping animations
-        } else if ((players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-                    !players.get(ErnestGame.loginName).getIsGrounded()) ||
-                   (players.get(ErnestGame.loginName).getVelocity().x == 0 &&
-                    !players.get(ErnestGame.loginName).getIsGrounded())) {
-          if (players.get(ErnestGame.loginName).getIsFacingRight()) {
+        } else if ((currentPlayer.getVelocity().x != 0 &&
+                    !currentPlayer.getIsGrounded()) ||
+                   (currentPlayer.getVelocity().x == 0 &&
+                    !currentPlayer.getIsGrounded())) {
+          if (currentPlayer.getIsFacingRight()) {
             TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+            batch.draw(currentFrame, currentPlayer.getPosition().x,
+                                     currentPlayer.getPosition().y,
+                                     currentPlayer.getWidth(),
+                                     currentPlayer.getHeight());
           } else {
             TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             currentFrame.flip(true, false);
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+            batch.draw(currentFrame, currentPlayer.getPosition().x,
+                                     currentPlayer.getPosition().y,
+                                     currentPlayer.getWidth(),
+                                     currentPlayer.getHeight());
           }
           
         //Idle animations
         } else {
           TextureRegion currentFrame = idleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-          batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                   players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-        }    //Walking animations
-        if (players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-            players.get(ErnestGame.loginName).getIsGrounded()) { 
-          if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-            Gdx.app.log("Direction", "Right");
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-            if (currentFrame.isFlipX()) {
-              currentFrame.flip(true, false);
-            }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-          } else {
-            Gdx.app.log("Direction", "Left");
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-            if (!currentFrame.isFlipX()) {
-              currentFrame.flip(true, false);
-            }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-          }
-        
-        //Jumping animations
-        } else if ((players.get(ErnestGame.loginName).getVelocity().x != 0 &&
-                    !players.get(ErnestGame.loginName).getIsGrounded()) ||
-                   (players.get(ErnestGame.loginName).getVelocity().x == 0 &&
-                    !players.get(ErnestGame.loginName).getIsGrounded())) {
-          if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-            if (currentFrame.isFlipX()) {
-              currentFrame.flip(true, false);
-            }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-          } else {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-            if (!currentFrame.isFlipX()) {
-              currentFrame.flip(true, false);
-            }
-            batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                     players.get(ErnestGame.loginName).getPosition().y, 32, 64);
-          }
-          
-        //Idle animations
-        } else {
-          TextureRegion currentFrame = idleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-          batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                   players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+          batch.draw(currentFrame, currentPlayer.getPosition().x,
+                                   currentPlayer.getPosition().y,
+                                   currentPlayer.getWidth(),
+                                   currentPlayer.getHeight());
         }
       }
     }
@@ -190,14 +152,18 @@ public class GameView {
           currentFrame.flip(true, false);
         }
         batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+                                 players.get(ErnestGame.loginName).getPosition().y,
+                                 players.get(ErnestGame.loginName).getWidth(),
+                                 players.get(ErnestGame.loginName).getHeight());
       } else {
         TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
         if (!currentFrame.isFlipX()) {
           currentFrame.flip(true, false);
         }
         batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+                                 players.get(ErnestGame.loginName).getPosition().y,
+                                 players.get(ErnestGame.loginName).getWidth(),
+                                 players.get(ErnestGame.loginName).getHeight());
       }
     
     //Jumping animations
@@ -211,21 +177,27 @@ public class GameView {
           currentFrame.flip(true, false);
         }
         batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+                                 players.get(ErnestGame.loginName).getPosition().y,
+                                 players.get(ErnestGame.loginName).getWidth(),
+                                 players.get(ErnestGame.loginName).getHeight());
       } else {
         TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
         if (!currentFrame.isFlipX()) {
           currentFrame.flip(true, false);
         }
         batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                                 players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+                                 players.get(ErnestGame.loginName).getPosition().y,
+                                 players.get(ErnestGame.loginName).getWidth(),
+                                 players.get(ErnestGame.loginName).getHeight());
       }
       
     //Idle animations
     } else {
       TextureRegion currentFrame = idleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
       batch.draw(currentFrame, players.get(ErnestGame.loginName).getPosition().x,
-                               players.get(ErnestGame.loginName).getPosition().y, 32, 64);
+                               players.get(ErnestGame.loginName).getPosition().y,
+                               players.get(ErnestGame.loginName).getWidth(),
+                               players.get(ErnestGame.loginName).getHeight());
     }
   }
   
