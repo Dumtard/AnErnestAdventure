@@ -26,6 +26,7 @@ public class GameView {
   
   private Animation walkAnimation;
   private Animation idleAnimation;
+  private Animation jumpAnimation;
   
   public GameView(SpriteBatch batch, OrthographicCamera camera, HashMap<String, Player> players, Area area) {
     this.batch = batch;
@@ -54,12 +55,19 @@ public class GameView {
       idleFrames[i] = atlas.findRegion("Idle-" + i); 
     }
     
-    TextureRegion[] walkFrames = new TextureRegion[2];
-    for (int i = 0; i < 2; i++) {
-      walkFrames[i] = atlas.findRegion("Walk-" + 0);
+    TextureRegion[] walkFrames = new TextureRegion[4];
+    for (int i = 0; i < 4; i++) {
+      walkFrames[i] = atlas.findRegion("Walk-" + i);
     }
+    
+    TextureRegion[] jumpFrames = new TextureRegion[1];
+    for (int i = 0; i < 1; i++) {
+      jumpFrames[i] = atlas.findRegion("Jump-" + i);
+    }
+    
     idleAnimation = new Animation(0.5f, idleFrames);
-    walkAnimation = new Animation(0.13f, walkFrames);
+    walkAnimation = new Animation(0.2f, walkFrames);
+    jumpAnimation = new Animation(1f, jumpFrames);
   }
   
   private void renderArea(float delta) {
@@ -116,13 +124,13 @@ public class GameView {
                    (currentPlayer.getVelocity().x == 0 &&
                     !currentPlayer.getIsGrounded())) {
           if (currentPlayer.getIsFacingRight()) {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             batch.draw(currentFrame, currentPlayer.getPosition().x,
                                      currentPlayer.getPosition().y,
                                      currentPlayer.getWidth(),
                                      currentPlayer.getHeight());
           } else {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             currentFrame.flip(true, false);
             batch.draw(currentFrame, currentPlayer.getPosition().x,
                                      currentPlayer.getPosition().y,
@@ -172,7 +180,7 @@ public class GameView {
                (players.get(ErnestGame.loginName).getVelocity().x == 0 &&
                 !players.get(ErnestGame.loginName).getIsGrounded())) {
       if (players.get(ErnestGame.loginName).getIsFacingRight()) {
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+        TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
         if (currentFrame.isFlipX()) {
           currentFrame.flip(true, false);
         }
@@ -181,7 +189,7 @@ public class GameView {
                                  players.get(ErnestGame.loginName).getWidth(),
                                  players.get(ErnestGame.loginName).getHeight());
       } else {
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+        TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
         if (!currentFrame.isFlipX()) {
           currentFrame.flip(true, false);
         }

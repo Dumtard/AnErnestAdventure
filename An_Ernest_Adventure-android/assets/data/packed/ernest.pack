@@ -17,9 +17,37 @@ Idle-1
   orig: 32, 64
   offset: 0, 0
   index: -1
-Walk-0
+Jump-0
   rotate: false
   xy: 69, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Walk-0
+  rotate: false
+  xy: 103, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Walk-1
+  rotate: false
+  xy: 137, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Walk-3
+  rotate: false
+  xy: 137, 1
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
+Walk-2
+  rotate: false
+  xy: 171, 1
   size: 32, 64
   orig: 32, 64
   offset: 0, 0
