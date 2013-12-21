@@ -44,19 +44,28 @@ public class Controller implements InputProcessor {
 
   @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-    // TODO Auto-generated method stub
+    if (screenY < (Gdx.graphics.getHeight()-(Gdx.graphics.getHeight()*(3.0f/15.0f)))) {
+      gameController.touchDown(screenX, screenY, pointer, button);
+    } else {
+      uiController.touchDown(screenX, screenY, pointer, button);
+    }
     return false;
   }
 
   @Override
   public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-    // TODO Auto-generated method stub
+    gameController.touchUp(screenX, screenY, pointer, button);
+    uiController.touchUp(screenX, screenY, pointer, button);
     return false;
   }
 
   @Override
   public boolean touchDragged(int screenX, int screenY, int pointer) {
-    // TODO Auto-generated method stub
+    if (screenY < (Gdx.graphics.getHeight()-(Gdx.graphics.getHeight()*(3.0f/15.0f)))) {
+      gameController.touchDragged(screenX, screenY, pointer);
+    } else {
+      uiController.touchDragged(screenX, screenY, pointer);
+    }
     return false;
   }
 

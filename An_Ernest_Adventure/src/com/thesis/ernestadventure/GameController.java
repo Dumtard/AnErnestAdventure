@@ -52,7 +52,9 @@ public class GameController {
           
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x-Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         } else if (area.tiles[tilePositionX+1][tilePositionY+1].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+1].x,
@@ -62,7 +64,9 @@ public class GameController {
 
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x-Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         } else if (area.tiles[tilePositionX+1][tilePositionY+2].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+2].x,
@@ -72,7 +76,9 @@ public class GameController {
 
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x-Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         }
 
@@ -86,7 +92,9 @@ public class GameController {
           
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x+Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         } else if (area.tiles[tilePositionX][tilePositionY+1].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+1].x,
@@ -96,7 +104,9 @@ public class GameController {
 
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x+Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         } else if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+2].x,
@@ -106,7 +116,9 @@ public class GameController {
 
           if (playerRect.overlaps(blockRect)) {
             player.getValue().setPosition(blockRect.x+Tile.SIZE, playerRect.y);
-            player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            if (player.getValue().getVelocity().y < 0) {
+              player.getValue().setVelocity(0, player.getValue().getVelocity().y);
+            }
           }
         }
       }
@@ -267,5 +279,21 @@ public class GameController {
       stop.position = players.get(ErnestGame.loginName).getPosition();
       client.sendUDP(stop);
     }
+  }
+  
+  public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+    Gdx.app.log("TouchDown", "Game Controller");
+    return false;
+  }
+  
+  
+  public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+    Gdx.app.log("TouchUp", "Game Controller");
+    return false;
+  }
+  
+  public boolean touchDragged(int screenX, int screenY, int pointer) {
+    Gdx.app.log("TouchDragged", "Game Controller");
+    return false;
   }
 }
