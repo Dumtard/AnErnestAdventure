@@ -17,9 +17,14 @@ public class UIController {
   }
   
   public void update(float delta) {
-    ui.toString();
-    client.toString();
-    players.toString();
+    if (ui.slider.getPosition() < 0) {
+      players.get(ErnestGame.loginName).setIsFacingRight(false);
+    } else {
+      players.get(ErnestGame.loginName).setIsFacingRight(true);
+    }
+    
+    players.get(ErnestGame.loginName).setVelocity(ui.slider.getPosition() * 3.0f,
+                                                  players.get(ErnestGame.loginName).getVelocity().y);
   }
   
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
