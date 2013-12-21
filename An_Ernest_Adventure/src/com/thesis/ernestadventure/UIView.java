@@ -13,8 +13,12 @@ public class UIView {
 
   TextureAtlas UI_Atlas;
   TextureRegion UI_Background; 
+  
   TextureRegion UI_Slider;
   TextureRegion UI_Slider_Selector;
+  
+  TextureRegion UI_Jump_Up;
+  TextureRegion UI_Jump_Down;
   
   private OrthographicCamera camera;
   
@@ -27,14 +31,34 @@ public class UIView {
     UI_Background = UI_Atlas.createSprite("UI_background");
     UI_Slider = UI_Atlas.createSprite("Slide_Bar");
     UI_Slider_Selector = UI_Atlas.createSprite("Slide_Selector");
+    UI_Jump_Up = UI_Atlas.createSprite("Jump_Up");
+    UI_Jump_Down = UI_Atlas.createSprite("Jump_Down");
   }
   
   public void render(float delta) {
+    // Background
     batch.draw(UI_Background, camera.position.x - (camera.viewportWidth/2.0f),
                               camera.position.y - (camera.viewportHeight/2.0f),
                               camera.viewportWidth,
                               camera.viewportHeight*(3.0f/15.0f));
-    batch.draw(UI_Slider, 5, 30, 200, 33);
-    batch.draw(UI_Slider_Selector, 5 + ((ui.slider.getPosition()+1)*100)-4, 30, 8, 33);
+    
+    // Jump Button
+    if (ui.jumpButton.getPressed()) {
+      batch.draw(UI_Jump_Down, camera.position.x-50,
+                              (camera.position.y - (camera.viewportHeight/2.0f))+30,
+                              100, 33);
+    } else {
+      batch.draw(UI_Jump_Up, camera.position.x-50,
+                            (camera.position.y - (camera.viewportHeight/2.0f))+30,
+                            100, 33);
+    }
+    
+    // Slider
+    batch.draw(UI_Slider, (camera.position.x - (camera.viewportWidth/2.0f))+5,
+                          (camera.position.y - (camera.viewportHeight/2.0f))+30,
+                          200, 33);
+    batch.draw(UI_Slider_Selector, (camera.position.x - (camera.viewportWidth/2.0f))+5 + ((ui.slider.getPosition()+1)*100)-4,
+                                   (camera.position.y - (camera.viewportHeight/2.0f))+30,
+                                   8, 33);
   }
 }

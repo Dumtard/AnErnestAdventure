@@ -188,6 +188,8 @@ public class GameController {
   }
 
   public void keyDown(int keycode) {
+//    Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
+    
     // Left Arrow && Right Arrow
     if (Gdx.input.isKeyPressed(21) && Gdx.input.isKeyPressed(22)) {
       players.get(ErnestGame.loginName).setVelocity(
@@ -237,7 +239,7 @@ public class GameController {
   }
 
   public void keyUp(int keycode) {
-    // Gdx.app.log("Key", "" + keycode);
+//     Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
 
     // Left Arrow && Right Arrow
     if (Gdx.input.isKeyPressed(21) && Gdx.input.isKeyPressed(22)) {

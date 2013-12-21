@@ -17,9 +17,23 @@ Slide_Bar
   orig: 200, 33
   offset: 0, 0
   index: -1
-Slide_Selector
+Jump_Down
   rotate: false
   xy: 803, 29
+  size: 100, 33
+  orig: 100, 33
+  offset: 0, 0
+  index: -1
+Jump_Up
+  rotate: false
+  xy: 905, 29
+  size: 100, 33
+  orig: 100, 33
+  offset: 0, 0
+  index: -1
+Slide_Selector
+  rotate: false
+  xy: 1005, 64
   size: 8, 33
   orig: 8, 33
   offset: 0, 0
