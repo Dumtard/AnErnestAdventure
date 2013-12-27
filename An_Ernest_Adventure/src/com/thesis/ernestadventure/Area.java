@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
 
 public class Area {
   String tileset;
@@ -12,9 +13,19 @@ public class Area {
   int width = 0;
   int height = 0;
   
+  Vector2 playerStart;
+  
   public Area() throws IOException {
+    loadArea(1);
+  }
+  
+  public Vector2 getStart() {
+    return playerStart;
+  }
+
+  public void loadArea(int areaNumber) throws IOException {
     FileHandle handle;
-    handle = Gdx.files.internal("areas/area1");    
+    handle = Gdx.files.internal("areas/area" + areaNumber);
     BufferedReader reader = handle.reader(65535);
 
     String line;
@@ -38,9 +49,9 @@ public class Area {
         if (line.equals("Back:")) {
           line = reader.readLine();
           
-          for (int i = 0; i < height; i++) {
+          for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-//              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, (GameScreen.GAMEHEIGHT-Tile.SIZE)-(i*Tile.SIZE));
+              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, (i*Tile.SIZE));
             }
             
             line = reader.readLine();
@@ -51,7 +62,9 @@ public class Area {
           
           for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, /*(GameScreen.GAMEHEIGHT-Tile.SIZE)-*/(i*Tile.SIZE));
+              if (line.charAt(j) == '#') {
+                tiles[j][i].id = line.charAt(j);
+              }
             }
             line = reader.readLine();
           }
@@ -73,6 +86,12 @@ public class Area {
             for (int j = 0; j < width; j++) {
               if (line.charAt(j) == '#') {
                 tiles[j][i].collidable = true;
+              } else if (line.charAt(j) == '@') {
+                playerStart = new Vector2(j*32, i*32);
+                tiles[j][i].collidable = false;
+              } else if (line.charAt(j) == '$') {
+                tiles[j][i].collidable = false;
+                tiles[j][i].exit = true;
               } else {
                 tiles[j][i].collidable = false;
               }
@@ -83,5 +102,4 @@ public class Area {
       }
     }
   }
-  
 }

@@ -1,8 +1,15 @@
 
-tiles.png
+Tiles.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+Door
+  rotate: false
+  xy: 1, 35
+  size: 32, 64
+  orig: 32, 64
+  offset: 0, 0
+  index: -1
 Tile#
   rotate: false
   xy: 1, 1
@@ -12,14 +19,14 @@ Tile#
   index: -1
 Tile@
   rotate: false
-  xy: 35, 1
+  xy: 35, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
 TileDot
   rotate: false
-  xy: 69, 1
+  xy: 35, 33
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

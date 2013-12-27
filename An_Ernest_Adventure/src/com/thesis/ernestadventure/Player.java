@@ -19,6 +19,15 @@ public class Player {
     isGrounded = false;
     isFacingRight = true;
   }
+  
+  public Player(Vector2 position) {
+    this.position = new Vector2(position);
+    velocity = new Vector2(0, 0);
+    width = 32;
+    height = 64;
+    isGrounded = false;
+    isFacingRight = true;
+  }
 
   public int getWidth() {
     return width;

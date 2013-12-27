@@ -38,17 +38,17 @@ public class GameView {
     sprite2 = new Sprite();
     sprite3 = new Sprite();
     
-    TextureAtlas tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.pack"));
+    TextureAtlas tileAtlas = new TextureAtlas(Gdx.files.internal("tiles/packed/Tiles.pack"));
     
     sprite1 = tileAtlas.createSprite("Tile#");
-    sprite2 = tileAtlas.createSprite("TileDot");
+    sprite2 = tileAtlas.createSprite("Door");
     sprite3 = tileAtlas.createSprite("Tile@");
     
     loadTextures();
   }
   
   private void loadTextures() {
-    TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("data/packed/ernest.pack"));
+    TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("data/packed/Ernest.pack"));
     
     TextureRegion[] idleFrames = new TextureRegion[2];
     for (int i = 0; i < 2; i++) {
@@ -73,15 +73,13 @@ public class GameView {
   private void renderArea(float delta) {
     for (int i = 0; i < area.height; i++) {
       for (int j = 0; j < area.width; j++) {
-        if (area.tiles[j][i].id == 35) {
+        if (area.tiles[j][i].id == '#') {
           sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite1.draw(batch);
-        } else if (area.tiles[j][i].id == 46) {
-          sprite2.setPosition(-100, -100);
+        } else if (area.tiles[j][i].id == '$') {
+          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite2.draw(batch);
-//          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-//          sprite2.draw(batch);
-        } else {
+        } else if (area.tiles[j][i].id == '@'){
           sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite3.draw(batch);
         }

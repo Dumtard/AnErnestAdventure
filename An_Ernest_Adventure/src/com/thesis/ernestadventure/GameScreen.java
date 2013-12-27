@@ -38,7 +38,7 @@ public class GameScreen implements Screen {
     }
     
     players = new HashMap<String, Player>();
-    players.put(ErnestGame.loginName, new Player());
+    players.put(ErnestGame.loginName, new Player(area.getStart()));
     
     view = new View(ui, players, area);
     controller = new Controller(client, ui, players, area);

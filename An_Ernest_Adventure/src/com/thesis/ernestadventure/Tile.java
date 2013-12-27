@@ -7,11 +7,13 @@ public class Tile {
   int id;
   int x, y;
   boolean collidable;
+  boolean exit;
   
   public Tile(int id, int x, int y) {
     this.id = id;
     this.x = x;
     this.y = y;
     this.collidable = true;
+    this.exit = false;
   }
 }

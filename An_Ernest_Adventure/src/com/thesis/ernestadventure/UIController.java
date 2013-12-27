@@ -26,7 +26,7 @@ public class UIController {
   public void update(float delta) {
     if (ui.slider.getPosition() < 0) {
       players.get(ErnestGame.loginName).setIsFacingRight(false);
-    } else {
+    } else if (ui.slider.getPosition() > 0) {
       players.get(ErnestGame.loginName).setIsFacingRight(true);
     }
     

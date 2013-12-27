@@ -1,5 +1,6 @@
 package com.thesis.ernestadventure;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class GameController {
       player.getValue().setVelocity(player.getValue().getVelocity().x, player.getValue().getVelocity().y - GRAVITY);
 
       
-      Rectangle playerRect = new Rectangle(player.getValue().getPosition().x+1, player.getValue().getPosition().y,
+      Rectangle playerRect = new Rectangle(player.getValue().getPosition().x, player.getValue().getPosition().y,
                                            player.getValue().getWidth()-2, player.getValue().getHeight()-2);
       
       // Collision
@@ -80,9 +81,21 @@ public class GameController {
               player.getValue().setVelocity(0, player.getValue().getVelocity().y);
             }
           }
+        
+        // New Level
+        } if (area.tiles[tilePositionX+1][tilePositionY].exit) {
+          try {
+            area.loadArea(2);
+          } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+          player.getValue().setPosition(area.getStart());
+          break;
         }
 
       // Left
+        
       } else if (playerRect.x < player.getValue().getPosition().x) {
         if (area.tiles[tilePositionX][tilePositionY].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,
