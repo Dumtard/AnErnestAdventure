@@ -2,6 +2,7 @@ package com.thesis.ernestadventure;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
@@ -197,6 +198,29 @@ public class GameController {
       // Update Player location
       player.getValue().setPosition(player.getValue().getPosition().x + (player.getValue().getVelocity().x * delta * Tile.SIZE),
                                     player.getValue().getPosition().y + (player.getValue().getVelocity().y * delta * Tile.SIZE));
+      
+      
+      // Bullets
+      Iterator<Bullet> i = player.getValue().bullets.iterator();
+      while (i.hasNext()) {
+        Bullet bullet = i.next();
+        bullet.position.add(bullet.velocity);
+        
+        if (bullet.position.x > (area.width*32) ||
+            bullet.position.y > (area.height*32) ||
+            bullet.position.x < 0 ||
+            bullet.position.y < 0) {
+          i.remove();
+          Gdx.app.log("Remove", "Removed");
+        }
+      }
+      for (Bullet bullet : player.getValue().bullets) {
+        bullet.position.add(bullet.velocity);
+        
+      }
+      if (player.getValue().bullets.size() > 50) {
+        player.getValue().bullets.remove(0);
+      }
     }
   }
 
@@ -297,18 +321,18 @@ public class GameController {
   }
   
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-    Gdx.app.log("TouchDown", "Game Controller");
+    players.get(ErnestGame.loginName).shoot(screenX, screenY);
     return false;
   }
   
   
   public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-    Gdx.app.log("TouchUp", "Game Controller");
+//    Gdx.app.log("TouchUp", "Game Controller");
     return false;
   }
   
   public boolean touchDragged(int screenX, int screenY, int pointer) {
-    Gdx.app.log("TouchDragged", "Game Controller");
+//    Gdx.app.log("TouchDragged", "Game Controller");
     return false;
   }
 }

@@ -1,5 +1,7 @@
 package com.thesis.ernestadventure;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.math.Vector2;
 
 public class Player {
@@ -10,6 +12,8 @@ public class Player {
   
   private boolean isGrounded;
   private boolean isFacingRight;
+  
+  public ArrayList<Bullet> bullets;
 
   public Player() {
     position = new Vector2(100, 300);
@@ -18,6 +22,8 @@ public class Player {
     height = 64;
     isGrounded = false;
     isFacingRight = true;
+    
+    bullets = new ArrayList<Bullet>();
   }
   
   public Player(Vector2 position) {
@@ -27,8 +33,14 @@ public class Player {
     height = 64;
     isGrounded = false;
     isFacingRight = true;
+    
+    bullets = new ArrayList<Bullet>();
   }
 
+  public void shoot(int screenX, int screenY) {
+    bullets.add(new Bullet(screenX, screenY));
+  }
+  
   public int getWidth() {
     return width;
   }

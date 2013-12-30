@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 
 public class GameView {
   private SpriteBatch batch;
@@ -23,6 +24,8 @@ public class GameView {
   private Sprite sprite1;
   private Sprite sprite2;
   private Sprite sprite3;
+  
+  private TextureRegion bullet;
   
   private Animation walkAnimation;
   private Animation idleAnimation;
@@ -68,6 +71,8 @@ public class GameView {
     idleAnimation = new Animation(0.5f, idleFrames);
     walkAnimation = new Animation(0.2f, walkFrames);
     jumpAnimation = new Animation(1f, jumpFrames);
+    
+    bullet = atlas.findRegion("Bullet");
   }
   
   private void renderArea(float delta) {
@@ -207,6 +212,35 @@ public class GameView {
     }
   }
   
+  private void renderBullets(float delta) {
+    for (Map.Entry<String, Player> player: players.entrySet()) {
+      for (Bullet bullet : player.getValue().bullets) {
+        //Convert bullet.getScreenX and bullet.getScreenY into world coords
+//        bullet.setScreenY((int));
+        if (!bullet.hasVelocity()) {
+          bullet.setX((((bullet.getScreenX()/(float)Gdx.graphics.getWidth())*camera.viewportWidth)+
+              (camera.position.x-camera.viewportWidth/(float)2))-4);
+          bullet.setY(((((camera.viewportHeight - bullet.getScreenY())/Gdx.graphics.getHeight())*
+              camera.viewportHeight)+camera.position.y)-(96-8)+4);
+          
+          bullet.velocity.x = bullet.position.x - (player.getValue().getPosition().x +
+                                                  (player.getValue().getWidth()/(float)2));
+          bullet.velocity.y = bullet.position.y - (player.getValue().getPosition().y +
+                                                  (player.getValue().getHeight()/(float)2));
+          bullet.velocity.nor().scl(5);
+          
+          bullet.position.x = (player.getValue().getPosition().x +
+                              (player.getValue().getWidth()/(float)2));
+          bullet.position.y = (player.getValue().getPosition().y +
+                              (player.getValue().getHeight()/(float)2));
+          bullet.position.add(new Vector2(bullet.velocity).scl(5));
+        }
+        
+        batch.draw(this.bullet, bullet.position.x, bullet.position.y, 8, 8);
+      }
+    }
+  }
+  
   public void updateCamera() {
     //Move Camera
     camera.position.set(players.get(ErnestGame.loginName).getPosition().x,
@@ -237,6 +271,7 @@ public class GameView {
   public void render(float delta) {
     renderArea(delta);
     renderPlayers(delta);
+    renderBullets(delta);
   }
   
 }
