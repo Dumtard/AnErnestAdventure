@@ -11,6 +11,7 @@ import com.thesis.ernestadventure.Network;
 import com.thesis.ernestadventure.Network.Connect;
 import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.Move;
+import com.thesis.ernestadventure.Network.Shoot;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class ErnestServer {
@@ -81,6 +82,13 @@ public class ErnestServer {
             }
           }
           return;
+        } else if (object instanceof Shoot) {
+          for (int i = 0; i < connections.size(); i++) {
+            if (c.getRemoteAddressUDP().getAddress() !=
+                connections.get(i).getRemoteAddressUDP().getAddress()) {
+              connections.get(i).sendUDP(object);
+            }
+          }
         }
       }
     });

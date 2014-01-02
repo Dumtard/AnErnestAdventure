@@ -215,8 +215,6 @@ public class GameView {
   private void renderBullets(float delta) {
     for (Map.Entry<String, Player> player: players.entrySet()) {
       for (Bullet bullet : player.getValue().bullets) {
-        //Convert bullet.getScreenX and bullet.getScreenY into world coords
-//        bullet.setScreenY((int));
         if (!bullet.hasVelocity()) {
           bullet.setX((((bullet.getScreenX()/(float)Gdx.graphics.getWidth())*camera.viewportWidth)+
               (camera.position.x-camera.viewportWidth/(float)2))-4);

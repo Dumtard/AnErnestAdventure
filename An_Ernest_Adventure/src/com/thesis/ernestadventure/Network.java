@@ -16,6 +16,7 @@ public class Network {
 		kryo.register(Vector2.class);
 		kryo.register(Move.class);
 		kryo.register(Stop.class);
+		kryo.register(Shoot.class);
 	}
 
 	static public class Connect {
@@ -28,10 +29,16 @@ public class Network {
 	
 	static public class Move {
 	  public String name;
+	  public Vector2 position;
 		public Vector2 velocity;
 	}
 	
 	static public class Stop {
+	  public String name;
+	  public Vector2 position;
+	}
+	
+	static public class Shoot {
 	  public String name;
 	  public Vector2 position;
 	}

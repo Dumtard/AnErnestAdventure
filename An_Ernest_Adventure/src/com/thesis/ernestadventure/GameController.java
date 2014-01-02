@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.thesis.ernestadventure.Network.Move;
+import com.thesis.ernestadventure.Network.Shoot;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class GameController {
@@ -211,7 +212,6 @@ public class GameController {
             bullet.position.x < 0 ||
             bullet.position.y < 0) {
           i.remove();
-          Gdx.app.log("Remove", "Removed");
         }
       }
       for (Bullet bullet : player.getValue().bullets) {
@@ -322,6 +322,11 @@ public class GameController {
   
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
     players.get(ErnestGame.loginName).shoot(screenX, screenY);
+    
+    Shoot shoot = new Shoot();
+    shoot.name = ErnestGame.loginName;
+    shoot.position = new Vector2(screenX, screenY);
+    client.sendUDP(shoot);
     return false;
   }
   

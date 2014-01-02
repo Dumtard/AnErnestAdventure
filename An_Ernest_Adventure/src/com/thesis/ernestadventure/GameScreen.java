@@ -12,6 +12,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.thesis.ernestadventure.Network.Connect;
 import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.Move;
+import com.thesis.ernestadventure.Network.Shoot;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class GameScreen implements Screen {
@@ -59,28 +60,29 @@ public class GameScreen implements Screen {
           
           return;
         } else if (object instanceof Move) {
-          System.out.println(((Move) object).name + ": " + ((Move) object).velocity.x + ", "
-              + ((Move) object).velocity.y);
-          
           players.get(((Move) object).name).setVelocity(((Move) object).velocity);
+          if (((Move) object).velocity.x < 0) {
+            players.get(((Move) object).name).setIsFacingRight(false);
+          } else {
+            players.get(((Move) object).name).setIsFacingRight(true);
+          }
           
           return;
         } else if (object instanceof Stop) {
-          System.out.println(((Stop) object).name + ": " + ((Stop) object).position.x + ", "
-              + ((Stop) object).position.y);
-
           players.get(((Stop) object).name).setPosition(((Stop) object).position);
           players.get(((Stop) object).name).setVelocity(0, 0);
           
           return;
+        } else if (object instanceof Shoot) {
+          players.get(((Shoot) object).name).
+              shoot((int)((Shoot) object).position.x, (int)((Shoot) object).position.y);
         }
       }
     });
     
     try {
-//      client.connect(5000, "localhost", 54555, 54555);  //Use this for desktop
-      client.connect(5000, "99.252.185.102", 54555, 54555); // Use this for android
-//      client.connect(5000, client.discoverHost(54555, 54555), 54555, 54555); // This doesn't work currently
+      client.connect(5000, "localhost", 54555, 54555);  // Local Server
+//      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
     } catch (IOException ex) {
       ex.printStackTrace();
     }
