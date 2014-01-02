@@ -244,6 +244,15 @@ public class GameController {
             i.remove();
             break;
           }  
+        } else if (area.tiles[bulletPositionX+1][bulletPositionY+1].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY+1].x,
+                                              area.tiles[bulletPositionX+1][bulletPositionY+1].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          if (bulletRect.overlaps(blockRect)) {
+            i.remove();
+            break;
+          }  
         }
         
       // Left
@@ -257,6 +266,15 @@ public class GameController {
             i.remove();
             break;
           }
+        } else if (area.tiles[bulletPositionX][bulletPositionY+1].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY+1].x,
+                                              area.tiles[bulletPositionX][bulletPositionY+1].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          if (bulletRect.overlaps(blockRect)) {
+            i.remove();
+            break;
+          }  
         }
       }
         
@@ -278,6 +296,15 @@ public class GameController {
             i.remove();
             break;
           }
+        } else if (area.tiles[bulletPositionX+1][bulletPositionY+1].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY+1].x,
+                                              area.tiles[bulletPositionX+1][bulletPositionY+1].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          if (bulletRect.overlaps(blockRect)) {
+            i.remove();
+            break;
+          }
         }
         
       // Bottom
@@ -285,6 +312,15 @@ public class GameController {
         if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
           Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY].x,
                                               area.tiles[bulletPositionX][bulletPositionY].y,
+                                              Tile.SIZE,
+                                              Tile.SIZE);
+          if (bulletRect.overlaps(blockRect)) {
+            i.remove();
+            break;
+          }
+        } else if (area.tiles[bulletPositionX+1][bulletPositionY].collidable) {
+          Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY].x,
+                                              area.tiles[bulletPositionX+1][bulletPositionY].y,
                                               Tile.SIZE,
                                               Tile.SIZE);
           if (bulletRect.overlaps(blockRect)) {
