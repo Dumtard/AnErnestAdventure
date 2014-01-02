@@ -81,8 +81,8 @@ public class GameScreen implements Screen {
     });
     
     try {
-      client.connect(5000, "localhost", 54555, 54555);  // Local Server
-//      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
+//      client.connect(5000, "localhost", 54555, 54555);  // Local Server
+      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
     } catch (IOException ex) {
       ex.printStackTrace();
     }
