@@ -10,9 +10,12 @@ public class Bullet {
   private int screenX;
   private int screenY;
   
+  public int size;
+  
   public Bullet() {
     velocity = new Vector2(0, 0);
     position = new Vector2(0, 0);
+    size = 8;
   }
   
   public Bullet(int x, int y) {
@@ -20,6 +23,7 @@ public class Bullet {
     this.screenY = y;
     velocity = new Vector2(0, 0);
     position = new Vector2(0, 0);
+    size = 8;
   }
   
   public boolean hasVelocity() {

@@ -217,9 +217,9 @@ public class GameView {
       for (Bullet bullet : player.getValue().bullets) {
         if (!bullet.hasVelocity()) {
           bullet.setX((((bullet.getScreenX()/(float)Gdx.graphics.getWidth())*camera.viewportWidth)+
-              (camera.position.x-camera.viewportWidth/(float)2))-4);
+              (camera.position.x-camera.viewportWidth/(float)2))-(bullet.size/2));
           bullet.setY(((((camera.viewportHeight - bullet.getScreenY())/Gdx.graphics.getHeight())*
-              camera.viewportHeight)+camera.position.y)-(96-8)+4);
+              camera.viewportHeight)+camera.position.y)-(96-8)+(bullet.size/2));
           
           bullet.velocity.x = bullet.position.x - (player.getValue().getPosition().x +
                                                   (player.getValue().getWidth()/(float)2));
@@ -234,7 +234,7 @@ public class GameView {
           bullet.position.add(new Vector2(bullet.velocity).scl(5));
         }
         
-        batch.draw(this.bullet, bullet.position.x, bullet.position.y, 8, 8);
+        batch.draw(this.bullet, bullet.position.x, bullet.position.y, bullet.size, bullet.size);
       }
     }
   }
