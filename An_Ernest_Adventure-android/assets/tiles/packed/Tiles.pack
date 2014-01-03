@@ -10,23 +10,30 @@ Door
   orig: 32, 64
   offset: 0, 0
   index: -1
-Tile#
+FloorTile
   rotate: false
   xy: 1, 1
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-Tile@
+Tile#
   rotate: false
   xy: 35, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0
   index: -1
-TileDot
+Tile@
   rotate: false
   xy: 35, 33
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+TileDot
+  rotate: false
+  xy: 69, 67
   size: 32, 32
   orig: 32, 32
   offset: 0, 0

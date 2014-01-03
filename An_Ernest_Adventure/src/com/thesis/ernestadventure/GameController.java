@@ -42,6 +42,7 @@ public class GameController {
     }
   }
 
+  //TODO refactor collisions into function(tilepositionX, tilepositionY)
   private void playerCollision(Player player) {
     // Apply Gravity
     player.setVelocity(player.getVelocity().x, player.getVelocity().y - GRAVITY);
@@ -110,7 +111,6 @@ public class GameController {
       }
 
     // Left
-      
     } else if (playerRect.x < player.getPosition().x) {
       if (area.tiles[tilePositionX][tilePositionY].collidable) {
         Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,

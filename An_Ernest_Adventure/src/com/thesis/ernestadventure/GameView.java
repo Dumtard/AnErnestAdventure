@@ -25,6 +25,8 @@ public class GameView {
   private Sprite sprite2;
   private Sprite sprite3;
   
+  private Sprite floorSprite;
+  
   private TextureRegion bullet;
   
   private Animation walkAnimation;
@@ -47,6 +49,9 @@ public class GameView {
     sprite2 = tileAtlas.createSprite("Door");
     sprite3 = tileAtlas.createSprite("Tile@");
     
+    floorSprite = tileAtlas.createSprite("FloorTile");
+    
+    // TODO Move loading into this function
     loadTextures();
   }
   
@@ -79,8 +84,8 @@ public class GameView {
     for (int i = 0; i < area.height; i++) {
       for (int j = 0; j < area.width; j++) {
         if (area.tiles[j][i].id == '#') {
-          sprite1.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
-          sprite1.draw(batch);
+          floorSprite.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+          floorSprite.draw(batch);
         } else if (area.tiles[j][i].id == '$') {
           sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite2.draw(batch);
