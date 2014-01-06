@@ -2,6 +2,7 @@ package com.thesis.ernestadventure;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
@@ -15,7 +16,12 @@ public class Area {
   
   Vector2 playerStart;
   
+  ArrayList<Vector2> enemyPositions;
+  ArrayList<Character> enemyType;
+  
   public Area() throws IOException {
+    enemyPositions = new ArrayList<Vector2>();
+    enemyType = new ArrayList<Character>();
     loadArea(1);
   }
   
@@ -94,6 +100,21 @@ public class Area {
                 tiles[j][i].exit = true;
               } else {
                 tiles[j][i].collidable = false;
+              }
+            }
+            line = reader.readLine();
+          }
+        }
+        if (line.equals("Enemies:")) {
+          enemyPositions.clear();
+          enemyType.clear();
+          line = reader.readLine();
+          
+          for (int i = height-1; i >= 0; i--) {
+            for (int j = 0; j < width; j++) {
+              if (line.charAt(j) != '.') {
+                enemyPositions.add(new Vector2(Tile.SIZE*j, Tile.SIZE*i));
+                enemyType.add(line.charAt(j));
               }
             }
             line = reader.readLine();

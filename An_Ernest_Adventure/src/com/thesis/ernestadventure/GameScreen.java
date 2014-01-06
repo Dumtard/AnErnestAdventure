@@ -1,11 +1,13 @@
 package com.thesis.ernestadventure;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -16,7 +18,7 @@ import com.thesis.ernestadventure.Network.Shoot;
 import com.thesis.ernestadventure.Network.Stop;
 
 public class GameScreen implements Screen {
-  public static final int GAMEHEIGHT = 480;
+  public static final float GAMEHEIGHT = 480f;
   
   private Controller controller;
   private View view;
@@ -25,7 +27,7 @@ public class GameScreen implements Screen {
   
   private UI ui;
   private HashMap<String, Player> players;
-//  private ArrayList<Enemy> enemies;
+  private ArrayList<Enemy> enemies;
 
   private Area area;
 
@@ -41,8 +43,16 @@ public class GameScreen implements Screen {
     players = new HashMap<String, Player>();
     players.put(ErnestGame.loginName, new Player(area.getStart()));
     
-    view = new View(ui, players, area);
-    controller = new Controller(client, ui, players, area);
+    enemies = new ArrayList<Enemy>();
+//    enemies.add(new Enemy(new Vector2(100, 200)));
+    for (Vector2 position : area.enemyPositions) {
+      Enemy e = new Enemy(position);
+      enemies.add(e);
+      //TODO enemy type
+    }
+    
+    view = new View(ui, players, area, enemies);
+    controller = new Controller(client, ui, players, area, enemies);
     
     client.start();
     Network.register(client);
@@ -51,7 +61,7 @@ public class GameScreen implements Screen {
       public void received(Connection c, Object object) {
         if (object instanceof Connect) {
           System.out.println(((Connect) object).name + " has joined");
-          players.put(((Connect) object).name, new Player());
+          players.put(((Connect) object).name, new Player(area.getStart()));
 
           return;
         } else if (object instanceof Disconnect) {

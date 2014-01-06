@@ -1,6 +1,7 @@
 package com.thesis.ernestadventure;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,16 +18,22 @@ public class GameController {
   private final float GRAVITY = 0.5f;
 
   private HashMap<String, Player> players;
+  private ArrayList<Enemy> enemies;
+  
+  private EnemyController enemyController;
 
   private Client client;
 
   private Area area;
 
   public GameController(Client client, HashMap<String, Player> players,
-      Area area) {
+      Area area, ArrayList<Enemy> enemies) {
     this.client = client;
     this.players = players;
     this.area = area;
+    this.enemies = enemies;
+    
+    enemyController = new EnemyController(client, players, area);
   }
 
   public void update(float delta) {
@@ -39,6 +46,10 @@ public class GameController {
                          player.getPosition().y + (player.getVelocity().y * delta * Tile.SIZE));
       
       bulletCollision(player);
+    }
+    
+    for(Enemy enemy : enemies) {
+      enemyController.update(enemy, delta);
     }
   }
 
@@ -100,13 +111,19 @@ public class GameController {
       // Next Area
       //TODO Make for ever side --It currently only enters levels where door is entered from the left
       } if (area.tiles[tilePositionX+1][tilePositionY].exit) {
+        enemies.clear();
         try {
           area.loadArea(2);
+          for (Vector2 position : area.enemyPositions) {
+            Enemy e = new Enemy(position);
+            enemies.add(e);
+            //TODO enemy type
+          }
+          player.setPosition(area.getStart());
+          player.bullets.clear();
         } catch (IOException e) {
           e.printStackTrace();
         }
-        player.setPosition(area.getStart());
-        player.bullets.clear();
         return;
       }
 
@@ -327,6 +344,19 @@ public class GameController {
             i.remove();
             break;
           }
+        }
+      }
+      
+      Iterator<Enemy> e = enemies.iterator();
+      while (e.hasNext()) {
+        Enemy enemy = e.next();
+        Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
+                                            32f, 32f);
+        
+        if (bulletRect.overlaps(enemyRect)) {
+          e.remove();
+          i.remove();
+          break;
         }
       }
     }

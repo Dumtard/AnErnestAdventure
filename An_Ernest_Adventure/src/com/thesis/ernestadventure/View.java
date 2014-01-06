@@ -1,5 +1,6 @@
 package com.thesis.ernestadventure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
@@ -13,19 +14,19 @@ public class View {
   private OrthographicCamera camera;
   private SpriteBatch batch;
   
-  public View(UI ui, HashMap<String, Player> players, Area area) {
+  public View(UI ui, HashMap<String, Player> players, Area area, ArrayList<Enemy> enemies) {
     int width = Gdx.graphics.getWidth();
     int height = Gdx.graphics.getHeight();
     
-    float aspectRatio = 480f/height;
+    float aspectRatio = GameScreen.GAMEHEIGHT/height;
     
-    camera = new OrthographicCamera(width * aspectRatio, 480);
-    camera.translate((width * aspectRatio) / 2, 480 / 2);
+    camera = new OrthographicCamera(GameScreen.GAMEHEIGHT / aspectRatio, 480);
+    camera.translate((GameScreen.GAMEHEIGHT / aspectRatio) / 2, 480 / 2);
 
     batch = new SpriteBatch();
     
     uiView = new UIView(ui, batch, camera);
-    gameView = new GameView(batch, camera, players, area);
+    gameView = new GameView(batch, camera, players, area, enemies);
   }
   
   public void dispose() {

@@ -1,5 +1,6 @@
 package com.thesis.ernestadventure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
@@ -10,11 +11,12 @@ public class Controller implements InputProcessor {
   private UIController uiController;
   private GameController gameController;
   
-  public Controller(Client client, UI ui, HashMap<String, Player> players, Area area) {
+  public Controller(Client client, UI ui, HashMap<String, Player> players, Area area, 
+      ArrayList<Enemy> enemies) {
     Gdx.input.setInputProcessor(this);
     
     uiController = new UIController(ui, client, players);
-    gameController = new GameController(client, players, area);
+    gameController = new GameController(client, players, area, enemies);
   }
 
   public void update(float delta) {

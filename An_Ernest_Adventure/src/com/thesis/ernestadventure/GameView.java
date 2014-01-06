@@ -1,5 +1,6 @@
 package com.thesis.ernestadventure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ public class GameView {
   private OrthographicCamera camera;
   
   private HashMap<String, Player> players;
+  private ArrayList<Enemy> enemies;
+  
   
   private Area area;
   
@@ -33,11 +36,15 @@ public class GameView {
   private Animation idleAnimation;
   private Animation jumpAnimation;
   
-  public GameView(SpriteBatch batch, OrthographicCamera camera, HashMap<String, Player> players, Area area) {
+  private Animation enemyIdleAnimation;
+  
+  public GameView(SpriteBatch batch, OrthographicCamera camera, 
+      HashMap<String, Player> players, Area area, ArrayList<Enemy> enemies) {
     this.batch = batch;
     this.camera = camera;
     this.players = players;
     this.area = area;
+    this.enemies = enemies;
     
     sprite1 = new Sprite();
     sprite2 = new Sprite();
@@ -78,6 +85,16 @@ public class GameView {
     jumpAnimation = new Animation(1f, jumpFrames);
     
     bullet = atlas.findRegion("Bullet");
+    
+    
+    //enemy animations
+    TextureAtlas enemyAtlas = new TextureAtlas(Gdx.files.internal("enemies/packed/Enemies.pack"));
+    
+    TextureRegion[] enemyIdleFrames = new TextureRegion[1];
+    for (int i = 0; i < 1; i++) {
+      enemyIdleFrames[i] = enemyAtlas.findRegion("Poo"); 
+    }
+    enemyIdleAnimation = new Animation(0.5f, enemyIdleFrames);
   }
   
   private void renderArea(float delta) {
@@ -94,6 +111,17 @@ public class GameView {
           sprite3.draw(batch);
         }
       }
+    }
+  }
+  
+  private void renderEnemies(float delta) {
+    for (Enemy enemy: enemies) {
+      TextureRegion currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+      
+      batch.draw(currentFrame, enemy.getPosition().x,
+                               enemy.getPosition().y,
+                               enemy.getWidth(),
+                               enemy.getHeight());
     }
   }
 
@@ -273,6 +301,7 @@ public class GameView {
   
   public void render(float delta) {
     renderArea(delta);
+    renderEnemies(delta);
     renderPlayers(delta);
     renderBullets(delta);
   }
