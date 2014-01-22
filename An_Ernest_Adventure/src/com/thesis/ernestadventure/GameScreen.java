@@ -3,6 +3,7 @@ package com.thesis.ernestadventure;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -13,6 +14,8 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.thesis.ernestadventure.Network.Connect;
 import com.thesis.ernestadventure.Network.Disconnect;
+import com.thesis.ernestadventure.Network.EnemyUpdate;
+import com.thesis.ernestadventure.Network.Initialize;
 import com.thesis.ernestadventure.Network.Move;
 import com.thesis.ernestadventure.Network.Shoot;
 import com.thesis.ernestadventure.Network.Stop;
@@ -32,33 +35,49 @@ public class GameScreen implements Screen {
   private Area area;
 
   public GameScreen() {
+    
+  }
+  
+  @Override
+  public void render(float delta) {
+    Gdx.gl.glClearColor(0, 0, 0, 1);
+    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+    
+    controller.update(delta);
+    view.render(delta);
+    
+    ErnestGame.GAMETIME += delta;
+    
+  }
+
+  @Override
+  public void resize(int width, int height) {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void show() {
     ui = new UI();
-    client = new Client();
-    try {
-      area = new Area();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    client = new Client(65536, 2048);
     
     players = new HashMap<String, Player>();
-    players.put(ErnestGame.loginName, new Player(area.getStart()));
-    
     enemies = new ArrayList<Enemy>();
-//    enemies.add(new Enemy(new Vector2(100, 200)));
-    for (Vector2 position : area.enemyPositions) {
-      Enemy e = new Enemy(position);
-      enemies.add(e);
-      //TODO enemy type
-    }
+    area = new Area();
     
-    view = new View(ui, players, area, enemies);
-    controller = new Controller(client, ui, players, area, enemies);
-    
+    //connect
     client.start();
     Network.register(client);
-   
+    try {
+      client.connect(5000, "localhost", 54555, 54555);  // Local Server
+//      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    
     client.addListener(new Listener() {
       public void received(Connection c, Object object) {
+//        System.out.println(object.getClass().getName());
+        
         if (object instanceof Connect) {
           System.out.println(((Connect) object).name + " has joined");
           players.put(((Connect) object).name, new Player(area.getStart()));
@@ -86,43 +105,100 @@ public class GameScreen implements Screen {
         } else if (object instanceof Shoot) {
           players.get(((Shoot) object).name).
               shoot((int)((Shoot) object).position.x, (int)((Shoot) object).position.y);
+          
+        } else if (object instanceof Initialize) {
+          try {
+            area.loadArea(((Initialize)object).area.intValue());
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          
+          enemies.clear();
+          synchronized (enemies) {
+            for (Enemy enemy : ((Initialize)object).enemies) {
+              enemies.add(enemy);
+            }
+          }
+          
+          players.clear();
+          synchronized (players) {
+            for (Map.Entry<String, Player> nameandplayer : ((Initialize)object).players.entrySet()) {
+              players.put(nameandplayer.getKey(), nameandplayer.getValue());
+            }
+//            Gdx.app.log("players size: ", ""+players.size());
+          }
+          
+        } else if (object instanceof EnemyUpdate) {
+          EnemyUpdate update = ((EnemyUpdate) object);
+//          Gdx.app.log("index", ""+update.index);
+//          Gdx.app.log("position", update.position.x + ", " + update.position.y);
+//          Gdx.app.log("velocity", update.velocity.x + ", " + update.velocity.y);
+          
+          enemies.get(update.index).setPosition(update.position);
+          enemies.get(update.index).setVelocity(update.velocity);
         }
       }
     });
-    
-    try {
-//      client.connect(5000, "localhost", 54555, 54555);  // Local Server
-      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
     
     Connect login = new Connect();
     login.name = ErnestGame.loginName;
 
     client.sendTCP(login);
-  }
-  
-  @Override
-  public void render(float delta) {
-    Gdx.gl.glClearColor(0, 0, 0, 1);
-    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-    
-    controller.update(delta);
-    view.render(delta);
-    
-    ErnestGame.GAMETIME += delta;
-    
-  }
 
-  @Override
-  public void resize(int width, int height) {
-    // TODO Auto-generated method stub
-  }
+    
+    //wait for replay
+    while (true) {
+      if (players.get(ErnestGame.loginName) != null) {
+        break;
+      }
+      Thread.yield();
+    }
+    
+    if (players.size() == 1) {
+//      client.setTimeout(20);
+      Area a = new Area();
+      a.width = area.width;
+      a.height = area.height;
+      client.sendTCP(a);
+//      client.sendTCP(area.tiles.length);
+      for (int i = 0; i < area.width; ++i) {
+        client.sendTCP(area.tiles[i]);
+      }
+//      client.sendTCP(new Move());
 
-  @Override
-  public void show() {
-    // TODO Auto-generated method stub
+      for (Vector2 position : area.enemyPositions) {
+        Enemy e = new Enemy(position);
+        enemies.add(e);
+        //TODO enemy type
+      }
+      client.sendTCP(enemies);
+    }
+    
+//    try {
+//      area = new Area();
+//      area.loadArea(1);
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+    
+//    players.put(ErnestGame.loginName, new Player(area.getStart()));
+    
+    players.get(ErnestGame.loginName).setPosition(area.getStart());
+    
+    Stop startPosition = new Stop();
+    startPosition.name = ErnestGame.loginName;
+    startPosition.position = players.get(ErnestGame.loginName).getPosition(); 
+    client.sendTCP(startPosition);
+
+//    enemies.add(new Enemy(new Vector2(100, 200)));
+//    for (Vector2 position : area.enemyPositions) {
+//      Enemy e = new Enemy(position);
+//      enemies.add(e);
+//      //TODO enemy type
+//    }
+    
+    view = new View(ui, players, area, enemies);
+    controller = new Controller(client, ui, players, area, enemies);
   }
 
   @Override

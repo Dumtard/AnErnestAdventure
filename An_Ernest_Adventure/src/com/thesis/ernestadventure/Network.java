@@ -1,5 +1,8 @@
 package com.thesis.ernestadventure;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.EndPoint;
@@ -17,6 +20,23 @@ public class Network {
 		kryo.register(Move.class);
 		kryo.register(Stop.class);
 		kryo.register(Shoot.class);
+    kryo.register(HashMap.class);
+    kryo.register(ArrayList.class);
+    kryo.register(String.class);
+    kryo.register(Integer.class);
+    kryo.register(Float.class);
+    kryo.register(Boolean.class);    
+    kryo.register(Enemy.class);
+    kryo.register(Player.class);
+    kryo.register(Tile[][].class);
+    kryo.register(Tile[].class);
+    kryo.register(Tile.class);
+    kryo.register(Area.class);
+    kryo.register(int.class);
+    kryo.register(float.class);
+    kryo.register(boolean.class);
+    kryo.register(Initialize.class);
+    kryo.register(EnemyUpdate.class);
 	}
 
 	static public class Connect {
@@ -40,6 +60,22 @@ public class Network {
 	
 	static public class Shoot {
 	  public String name;
-	  public Vector2 position;
+    public Vector2 position;
 	}
+	
+	static public class Initialize {
+	  public Integer area;
+	  public ArrayList<Enemy> enemies;
+	  public HashMap<String, Player> players;
+	}
+	
+	static public class EnemyUpdate {
+	  public Integer index;
+	  public Vector2 position;
+	  public Vector2 velocity;
+	}
+	
+//	static public class AreaSize() {
+//	  public 
+//	}
 }

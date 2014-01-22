@@ -9,20 +9,19 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.Vector2;
 
 public class Area {
-  String tileset;
-  Tile[][] tiles;
-  int width = 0;
-  int height = 0;
+  public String tileset;
+  public Integer width = 0;
+  public Integer height = 0;
+  public Tile[][] tiles;
   
-  Vector2 playerStart;
+  public Vector2 playerStart;
   
-  ArrayList<Vector2> enemyPositions;
-  ArrayList<Character> enemyType;
+  public ArrayList<Vector2> enemyPositions;
+  public ArrayList<Character> enemyType;
   
-  public Area() throws IOException {
+  public Area() {
     enemyPositions = new ArrayList<Vector2>();
     enemyType = new ArrayList<Character>();
-    loadArea(1);
   }
   
   public Vector2 getStart() {
@@ -69,7 +68,7 @@ public class Area {
           for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
               if (line.charAt(j) == '#') {
-                tiles[j][i].id = line.charAt(j);
+                tiles[j][i].id = (int)line.charAt(j);
               }
             }
             line = reader.readLine();

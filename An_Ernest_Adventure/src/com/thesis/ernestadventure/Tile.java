@@ -4,10 +4,12 @@ public class Tile {
 
   public static final int SIZE = 32;
   
-  int id;
-  int x, y;
-  boolean collidable;
-  boolean exit;
+  public Integer id;
+  public Integer x, y;
+  public Boolean exit;
+  public Boolean collidable;
+  
+  public Tile() {}
   
   public Tile(int id, int x, int y) {
     this.id = id;
