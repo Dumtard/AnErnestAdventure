@@ -39,7 +39,7 @@ public class GameController {
   public void update(float delta) {
     for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
       Player player = nameandplayer.getValue();
-      playerCollision(player);
+      playerCollision(player, nameandplayer.getKey());
 
       // Update Player location
       player.setPosition(player.getPosition().x + (player.getVelocity().x * delta * Tile.SIZE),
@@ -54,7 +54,9 @@ public class GameController {
   }
 
   //TODO refactor collisions into function(tilepositionX, tilepositionY)
-  private void playerCollision(Player player) {
+  private void playerCollision(Player player, String name) {
+       
+    
     // Apply Gravity
     player.setVelocity(player.getVelocity().x, player.getVelocity().y - GRAVITY);
 
@@ -110,16 +112,35 @@ public class GameController {
       
       // Next Area
       //TODO Make for ever side --It currently only enters levels where door is entered from the left
-      } if (area.tiles[tilePositionX+1][tilePositionY].exit) {
+      } if (area.tiles[tilePositionX+1][tilePositionY].exit && name.equals(ErnestGame.loginName)) {
         enemies.clear();
         try {
-          area.loadArea(2);
+          area.loadArea(++area.index);
+          Area a = new Area();
+          a.width = area.width;
+          a.height = area.height;
+          a.index = area.index;
+          client.sendTCP(a);
+          for (int i = 0; i < area.width; ++i) {
+            client.sendTCP(area.tiles[i]);
+          }
+          
           for (Vector2 position : area.enemyPositions) {
             Enemy e = new Enemy(position);
             enemies.add(e);
             //TODO enemy type
           }
-          player.setPosition(area.getStart());
+          client.sendTCP(enemies);
+          
+          
+          for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
+           nameandplayer.getValue().setPosition(area.getStart());
+           Stop newPosition = new Stop();
+           newPosition.name = nameandplayer.getKey();
+           newPosition.position = nameandplayer.getValue().getPosition();
+           client.sendUDP(newPosition);
+          }
+          
           player.bullets.clear();
         } catch (IOException e) {
           e.printStackTrace();
@@ -352,7 +373,7 @@ public class GameController {
         while (e.hasNext()) {
           Enemy enemy = e.next();
           Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
-                                              32f, 32f);
+                                              enemy.getWidth(), enemy.getHeight());
           
           if (bulletRect.overlaps(enemyRect)) {
             e.remove();

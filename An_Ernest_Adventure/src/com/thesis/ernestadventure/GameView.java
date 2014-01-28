@@ -37,6 +37,7 @@ public class GameView {
   private Animation jumpAnimation;
   
   private Animation enemyIdleAnimation;
+  private Animation bomberEnemyIdleAnimation;
   
   public GameView(SpriteBatch batch, OrthographicCamera camera, 
       HashMap<String, Player> players, Area area, ArrayList<Enemy> enemies) {
@@ -92,9 +93,15 @@ public class GameView {
     
     TextureRegion[] enemyIdleFrames = new TextureRegion[1];
     for (int i = 0; i < 1; i++) {
-      enemyIdleFrames[i] = enemyAtlas.findRegion("Poo"); 
+      enemyIdleFrames[i] = enemyAtlas.findRegion("Poo");
     }
     enemyIdleAnimation = new Animation(0.5f, enemyIdleFrames);
+    
+    TextureRegion[] bomberEnemyIdleFrames = new TextureRegion[2];
+    for (int i = 0; i < 2; i++) {
+      bomberEnemyIdleFrames[i] = enemyAtlas.findRegion("Bomber");
+    }
+    bomberEnemyIdleAnimation = new Animation(0.5f, enemyIdleFrames);
   }
   
   private void renderArea(float delta) {
@@ -116,12 +123,16 @@ public class GameView {
   
   private void renderEnemies(float delta) {
     for (Enemy enemy: enemies) {
-      TextureRegion currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-      
+      TextureRegion currentFrame = null;
+      if (enemy instanceof Enemy) {
+        currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+      } else if (enemy instanceof BomberEnemy) {
+        currentFrame = bomberEnemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+      }
       batch.draw(currentFrame, enemy.getPosition().x,
                                enemy.getPosition().y,
-                               enemy.getWidth(),
-                               enemy.getHeight());
+                               currentFrame.getRegionWidth(),
+                               currentFrame.getRegionHeight());
     }
   }
 

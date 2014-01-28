@@ -3,16 +3,20 @@ package com.thesis.ernestadventure.server;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.minlog.Log;
 import com.thesis.ernestadventure.Area;
+import com.thesis.ernestadventure.BomberEnemy;
 import com.thesis.ernestadventure.Enemy;
 import com.thesis.ernestadventure.Network;
+import com.thesis.ernestadventure.Network.BomberEnemyUpdate;
 import com.thesis.ernestadventure.Network.Connect;
 import com.thesis.ernestadventure.Network.EnemyUpdate;
 import com.thesis.ernestadventure.Network.Initialize;
@@ -39,6 +43,7 @@ public class ErnestServer {
       float delta = (current - previous)/1000.0f;
       previous = current;
       
+      playerUpdate(delta);
       enemyUpdate(delta);
       try {
         Thread.sleep(1);
@@ -49,6 +54,16 @@ public class ErnestServer {
     }
   }
   
+  private void playerUpdate(float delta) {
+    for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
+      Player player = nameandplayer.getValue();
+      
+      player.setPosition(player.getPosition().x + (player.getVelocity().x * delta),
+                         player.getPosition().y + (player.getVelocity().y * delta));
+    }
+    
+  }
+  
   private void enemyUpdate(float delta) {
 //    System.out.println("numEnemies: " + enemies.size());
     for (int i = 0; i < enemies.size(); ++i) {
@@ -56,31 +71,83 @@ public class ErnestServer {
       enemy.setPosition(enemy.getPosition().x + (enemy.getVelocity().x * delta),
                         enemy.getPosition().y + (enemy.getVelocity().y * delta));
       
-      Rectangle enemyRect = new Rectangle(enemy.getPosition().x+1, enemy.getPosition().y,
-          enemy.getWidth()-1, enemy.getHeight()-2);
-      
-      int tilePositionX = (int) (enemyRect.x / Tile.SIZE);
-      int tilePositionY = (int) (enemyRect.y / Tile.SIZE);
-      
-      // + ", " + tilePositionY);
-
-      if (tilePositionX+1 < area.width && area.tiles[tilePositionX+1][tilePositionY].collidable    ||
-          area.tiles[tilePositionX][tilePositionY].collidable      ||
-          tilePositionX+1 < area.width && !area.tiles[tilePositionX+1][tilePositionY-1].collidable ||
-          !area.tiles[tilePositionX][tilePositionY-1].collidable) {
-//        if (enemy.getVelocity().x > 0) {
-//          enemy.setPosition((tilePositionX)*Tile.SIZE, enemy.getPosition().y);
-//        } else if (enemy.getVelocity().x < 0) {
-//          enemy.setPosition((tilePositionX+1)*Tile.SIZE, enemy.getPosition().y);
-//        }
+    Rectangle enemyRect = new Rectangle(enemy.getPosition().x+1, enemy.getPosition().y,
+        enemy.getWidth()-1, enemy.getHeight()-2);
+    
+    int tilePositionX = (int) (enemyRect.x / Tile.SIZE);
+    int tilePositionY = (int) (enemyRect.y / Tile.SIZE);
+    
+      if (enemy instanceof Enemy) {
+        if (tilePositionX+1 < area.width && area.tiles[tilePositionX+1][tilePositionY].collidable    ||
+            area.tiles[tilePositionX][tilePositionY].collidable      ||
+            tilePositionX+1 < area.width && !area.tiles[tilePositionX+1][tilePositionY-1].collidable ||
+            !area.tiles[tilePositionX][tilePositionY-1].collidable) {
+  //        if (enemy.getVelocity().x > 0) {
+  //          enemy.setPosition((tilePositionX)*Tile.SIZE, enemy.getPosition().y);
+  //        } else if (enemy.getVelocity().x < 0) {
+  //          enemy.setPosition((tilePositionX+1)*Tile.SIZE, enemy.getPosition().y);
+  //        }
+          
+          enemy.getVelocity().scl(-1);
+          EnemyUpdate update = new EnemyUpdate();
+          update.index = i;
+          update.position = enemy.getPosition();
+          update.velocity = enemy.getVelocity();
+          server.sendToAllUDP(update);
+  //        System.out.println("Collision: (" + tilePositionX + ", " + tilePositionY + ")");
+        }
         
-        enemy.getVelocity().scl(-1);
-        EnemyUpdate update = new EnemyUpdate();
-        update.index = i;
-        update.position = enemy.getPosition();
-        update.velocity = enemy.getVelocity();
-        server.sendToAllUDP(update);
-//        System.out.println("Collision: (" + tilePositionX + ", " + tilePositionY + ")");
+      } else if (enemy instanceof BomberEnemy) {
+        boolean sendUpdate = false;
+        if (area.tiles[tilePositionX+1][tilePositionY].collidable ||
+            area.tiles[tilePositionX][tilePositionY].collidable) {
+          enemy.getVelocity().scl(-1);
+          enemy.setIsFacingRight(!enemy.getIsFacingRight());
+          sendUpdate = true;
+        }
+        
+        if (enemy.getIsFacingRight()) {
+          tilePositionX++;
+        }
+        for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
+          Player player = nameandplayer.getValue();
+          int playerTilePositionX = (int) (player.getPosition().x / Tile.SIZE);
+          if (tilePositionX == playerTilePositionX) {
+            if (!((BomberEnemy)enemy).attacking) {
+              enemy.attack();
+              sendUpdate = true;
+            }
+          }
+        }
+        
+        //dropping bullets
+        if (((BomberEnemy)enemy).attacking) {
+          ((BomberEnemy)enemy).bullet.y += ((BomberEnemy)enemy).bulletVelocity;
+        } else {
+          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+        }
+        
+        //bullet collisions
+        int bulletTilePositionX = (int)(((BomberEnemy)enemy).bullet.x / Tile.SIZE);
+        int bulletTilePositionY = (int)(((BomberEnemy)enemy).bullet.y / Tile.SIZE);
+        if (area.tiles[bulletTilePositionX][bulletTilePositionY-1].collidable) {
+          ((BomberEnemy)enemy).attacking = false;
+          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+          sendUpdate = true;
+        }
+        
+        if (sendUpdate) {
+          BomberEnemyUpdate update = new BomberEnemyUpdate();
+          update.index = i;
+          update.position = enemy.getPosition();
+          update.velocity = enemy.getVelocity();
+          update.attacking = ((BomberEnemy)enemy).attacking;
+          server.sendToAllUDP(update);
+          
+        }
+        
       }
     }
   }
@@ -157,10 +224,16 @@ public class ErnestServer {
         
         } else if (object instanceof ArrayList) {
           enemies = (ArrayList<Enemy>) object;
+          for (int i = 0; i < connections.size(); i++) {
+            if (c.getRemoteAddressUDP().getAddress() != 
+                connections.get(i).getRemoteAddressUDP().getAddress()) {
+              connections.get(i).sendUDP(enemies);
+            }
+          }
         
         } else if (object instanceof Move) {
-//          players.get(((Move) object).name).setPosition(((Move) object).position);
-//          players.get(((Move) object).name).setVelocity(((Move) object).velocity);
+          players.get(((Move) object).name).setPosition(((Move) object).position);
+          players.get(((Move) object).name).setVelocity(((Move) object).velocity);
           
           for (int i = 0; i < connections.size(); i++) {
             if (c.getRemoteAddressUDP().getAddress() != 
@@ -172,6 +245,7 @@ public class ErnestServer {
           
         } else if (object instanceof Stop) {
           players.get(((Stop) object).name).setPosition(((Stop) object).position);
+          players.get(((Stop) object).name).setVelocity(new Vector2(0, 0));
           
           for (int i = 0; i < connections.size(); i++) {
             if (c.getRemoteAddressUDP().getAddress() != 
@@ -190,15 +264,27 @@ public class ErnestServer {
           
         } else if (object instanceof Area) {
           enemies.clear();
+
           area = new Area();
           area = ((Area)object);
           area.tiles = new Tile[area.width][area.height];
           area.width = 0;
+          areaIndex = area.index;
+          
+          for (int i = 0; i < connections.size(); i++) {
+            if (c.getRemoteAddressUDP().getAddress() !=
+                connections.get(i).getRemoteAddressUDP().getAddress()) {
+              connections.get(i).sendTCP(area);
+            }
+          }
+          
           
         } else if (object instanceof Tile[]) {
           area.tiles[area.width] = ((Tile[])object);
           area.width++;
         }
+        
+        
       }
     });
 

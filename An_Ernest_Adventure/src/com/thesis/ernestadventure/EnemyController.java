@@ -26,18 +26,14 @@ public class EnemyController {
   public void update (Enemy enemy, float delta) {
     enemy.setPosition(enemy.getPosition().x + (enemy.getVelocity().x * delta),
                       enemy.getPosition().y + (enemy.getVelocity().y * delta));
-//    
-//    Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
-//        enemy.getWidth()-2, enemy.getHeight()-2);
-//    
-//    int tilePositionX = (int) (enemyRect.x / Tile.SIZE);
-//    int tilePositionY = (int) (enemyRect.y / Tile.SIZE);
-//    
-//    if (area.tiles[tilePositionX+1][tilePositionY].collidable ||
-//        area.tiles[tilePositionX][tilePositionY].collidable   ||
-//        !area.tiles[tilePositionX+1][tilePositionY-1].collidable ||
-//        !area.tiles[tilePositionX][tilePositionY-1].collidable) {
-//      enemy.getVelocity().scl(-1);
-//    }
+
+    if (enemy instanceof BomberEnemy) {
+      if (((BomberEnemy)enemy).attacking) {
+        ((BomberEnemy)enemy).bullet.y  += ((BomberEnemy)enemy).bulletVelocity;
+      } else {
+        ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+        ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+      }
+    }
   }
 }

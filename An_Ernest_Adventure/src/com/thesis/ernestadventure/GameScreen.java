@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.thesis.ernestadventure.Network.BomberEnemyUpdate;
 import com.thesis.ernestadventure.Network.Connect;
 import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.EnemyUpdate;
@@ -128,14 +129,48 @@ public class GameScreen implements Screen {
 //            Gdx.app.log("players size: ", ""+players.size());
           }
           
+        } else if (object instanceof ArrayList) {
+          enemies.clear();
+          synchronized (enemies) {
+            for (Enemy enemy : (ArrayList<Enemy>)object) {
+              enemies.add(enemy);
+            }
+          }
         } else if (object instanceof EnemyUpdate) {
           EnemyUpdate update = ((EnemyUpdate) object);
 //          Gdx.app.log("index", ""+update.index);
 //          Gdx.app.log("position", update.position.x + ", " + update.position.y);
 //          Gdx.app.log("velocity", update.velocity.x + ", " + update.velocity.y);
           
+          try {
+            enemies.get(update.index).setIsFacingRight(update.isFacingRight);
+            enemies.get(update.index).setPosition(update.position);
+            enemies.get(update.index).setVelocity(update.velocity);
+          } catch (IndexOutOfBoundsException e) {
+            
+          }
+        
+        } else if (object instanceof BomberEnemyUpdate) {
+          BomberEnemyUpdate update = ((BomberEnemyUpdate) object);
+//        Gdx.app.log("index", ""+update.index);
+//        Gdx.app.log("position", update.position.x + ", " + update.position.y);
+//        Gdx.app.log("velocity", update.velocity.x + ", " + update.velocity.y);
+        
+        try {
+          enemies.get(update.index).setIsFacingRight(update.isFacingRight);
           enemies.get(update.index).setPosition(update.position);
           enemies.get(update.index).setVelocity(update.velocity);
+          ((BomberEnemy)enemies.get(update.index)).attacking = update.attacking;
+        } catch (IndexOutOfBoundsException e) {
+          
+        }
+          
+        } else if (object instanceof Area) {
+          try {
+            area.loadArea(((Area)object).index);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
         }
       }
     });
@@ -160,7 +195,6 @@ public class GameScreen implements Screen {
       a.width = area.width;
       a.height = area.height;
       client.sendTCP(a);
-//      client.sendTCP(area.tiles.length);
       for (int i = 0; i < area.width; ++i) {
         client.sendTCP(area.tiles[i]);
       }

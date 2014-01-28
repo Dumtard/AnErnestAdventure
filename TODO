@@ -1,5 +1,11 @@
-multiple enemy types - ranged, flying?
-sound fx - shooting, running, jumping, dying
-unlockable abilities - double jump, multishot
-level linking
-update sprites - first/second player, levels/layers/background, enemies/animations
+1: multiple enemy types - ranged, flying?
+2: sound fx - shooting, running, jumping, dying
+3: dying
+4: intro screen/death screen
+5: level linking
+6: unlockable abilities - double jump, multishot
+7: update sprites - first/second player, levels/layers/background, enemies/animations
+
+
+
+CURRENT: Add enemy2 loading in the level, test BomberEnemy

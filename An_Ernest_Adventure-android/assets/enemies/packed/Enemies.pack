@@ -3,10 +3,38 @@ Enemies.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
+Bomber-0
+  rotate: false
+  xy: 1, 53
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: -1
+Bomber-1
+  rotate: false
+  xy: 1, 19
+  size: 64, 32
+  orig: 64, 32
+  offset: 0, 0
+  index: -1
 Poo
   rotate: false
-  xy: 1, 1
+  xy: 67, 21
   size: 32, 64
   orig: 32, 64
+  offset: 0, 0
+  index: -1
+BomberBomb-0
+  rotate: false
+  xy: 1, 1
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+BomberBomb-1
+  rotate: false
+  xy: 101, 69
+  size: 16, 16
+  orig: 16, 16
   offset: 0, 0
   index: -1

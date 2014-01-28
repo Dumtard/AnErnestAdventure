@@ -27,14 +27,15 @@ public class Network {
     kryo.register(Float.class);
     kryo.register(Boolean.class);    
     kryo.register(Enemy.class);
+    kryo.register(BomberEnemy.class);
     kryo.register(Player.class);
     kryo.register(Tile[][].class);
     kryo.register(Tile[].class);
     kryo.register(Tile.class);
     kryo.register(Area.class);
-    kryo.register(int.class);
-    kryo.register(float.class);
-    kryo.register(boolean.class);
+//    kryo.register(int.class);
+//    kryo.register(float.class);
+//    kryo.register(boolean.class);
     kryo.register(Initialize.class);
     kryo.register(EnemyUpdate.class);
 	}
@@ -71,9 +72,18 @@ public class Network {
 	
 	static public class EnemyUpdate {
 	  public Integer index;
+	  public Boolean isFacingRight;
 	  public Vector2 position;
 	  public Vector2 velocity;
 	}
+	
+	static public class BomberEnemyUpdate {
+    public Integer index;
+    public Boolean isFacingRight;
+    public Vector2 position;
+    public Vector2 velocity;
+    public Boolean attacking;
+  }
 	
 //	static public class AreaSize() {
 //	  public 

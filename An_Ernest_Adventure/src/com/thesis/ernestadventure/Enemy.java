@@ -5,19 +5,19 @@ import java.util.ArrayList;
 import com.badlogic.gdx.math.Vector2;
 
 public class Enemy {
-  private Vector2 position;
-  private Vector2 velocity;
-  private int width;
-  private int height;
+  protected Vector2 position;
+  protected Vector2 velocity;
+  protected int width;
+  protected int height;
   
-  private boolean isGrounded;
-  private boolean isFacingRight;
+  protected boolean isGrounded;
+  protected boolean isFacingRight;
   
   public Enemy() {
     position = new Vector2(100, 300);
     velocity = new Vector2(40, 0);
     width = 32;
-    height = 64;
+    height = 32;
     isGrounded = false;
     isFacingRight = true;
   }
@@ -26,7 +26,7 @@ public class Enemy {
     this.position = new Vector2(position);
     velocity = new Vector2(40, 0);
     width = 32;
-    height = 64;
+    height = 32;
     isGrounded = false;
     isFacingRight = true;
   }

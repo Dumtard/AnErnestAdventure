@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Area {
   public String tileset;
+  public Integer index;
   public Integer width = 0;
   public Integer height = 0;
   public Tile[][] tiles;
@@ -22,6 +23,7 @@ public class Area {
   public Area() {
     enemyPositions = new ArrayList<Vector2>();
     enemyType = new ArrayList<Character>();
+    index = new Integer(1);
   }
   
   public Vector2 getStart() {
@@ -29,6 +31,7 @@ public class Area {
   }
 
   public void loadArea(int areaNumber) throws IOException {
+    index = areaNumber;
     FileHandle handle;
     handle = Gdx.files.internal("areas/area" + areaNumber);
     BufferedReader reader = handle.reader(65535);
