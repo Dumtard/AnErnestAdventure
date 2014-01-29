@@ -38,6 +38,7 @@ public class GameView {
   
   private Animation enemyIdleAnimation;
   private Animation bomberEnemyIdleAnimation;
+  private Animation bomberBombIdleAnimation;
   
   public GameView(SpriteBatch batch, OrthographicCamera camera, 
       HashMap<String, Player> players, Area area, ArrayList<Enemy> enemies) {
@@ -99,9 +100,15 @@ public class GameView {
     
     TextureRegion[] bomberEnemyIdleFrames = new TextureRegion[2];
     for (int i = 0; i < 2; i++) {
-      bomberEnemyIdleFrames[i] = enemyAtlas.findRegion("Bomber");
+      bomberEnemyIdleFrames[i] = enemyAtlas.findRegion("Bomber-" + i);
     }
-    bomberEnemyIdleAnimation = new Animation(0.5f, enemyIdleFrames);
+    bomberEnemyIdleAnimation = new Animation(0.25f, bomberEnemyIdleFrames);
+    
+    TextureRegion[] bomberBombIdleFrames = new TextureRegion[2];
+    for (int i = 0; i < 2; i++) {
+      bomberBombIdleFrames[i] = enemyAtlas.findRegion("BomberBomb-" + i);
+    }
+    bomberBombIdleAnimation = new Animation(0.5f, bomberBombIdleFrames);
   }
   
   private void renderArea(float delta) {
@@ -122,17 +129,45 @@ public class GameView {
   }
   
   private void renderEnemies(float delta) {
-    for (Enemy enemy: enemies) {
+//    for (Enemy enemy: enemies) {
+    for (int i = 0; i < enemies.size(); ++i) {
       TextureRegion currentFrame = null;
-      if (enemy instanceof Enemy) {
-        currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-      } else if (enemy instanceof BomberEnemy) {
+      if (enemies.get(i) instanceof BomberEnemy) {
+        //draw bomberEnemy
+        
         currentFrame = bomberEnemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+        if (enemies.get(i).getIsFacingRight()) {
+          if (!currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+          }
+          batch.draw(currentFrame, enemies.get(i).getPosition().x,
+              enemies.get(i).getPosition().y,
+              currentFrame.getRegionWidth(),
+              currentFrame.getRegionHeight());
+        } else {
+          if (currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+          }
+          batch.draw(currentFrame, enemies.get(i).getPosition().x,
+              enemies.get(i).getPosition().y,
+              currentFrame.getRegionWidth(),
+              currentFrame.getRegionHeight());
+        }
+        
+        //draw bombs
+        TextureRegion bomb = bomberBombIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+        batch.draw(bomb, ((BomberEnemy)enemies.get(i)).bullet.x,
+            ((BomberEnemy)enemies.get(i)).bullet.y,
+            bomb.getRegionWidth(),
+            bomb.getRegionHeight());
+      } else if (enemies.get(i) instanceof Enemy) {
+        //draw enemy
+        currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+        batch.draw(currentFrame, enemies.get(i).getPosition().x,
+            enemies.get(i).getPosition().y,
+            currentFrame.getRegionWidth(),
+            currentFrame.getRegionHeight());
       }
-      batch.draw(currentFrame, enemy.getPosition().x,
-                               enemy.getPosition().y,
-                               currentFrame.getRegionWidth(),
-                               currentFrame.getRegionHeight());
     }
   }
 

@@ -38,6 +38,7 @@ public class Network {
 //    kryo.register(boolean.class);
     kryo.register(Initialize.class);
     kryo.register(EnemyUpdate.class);
+    kryo.register(BomberEnemyUpdate.class);
 	}
 
 	static public class Connect {

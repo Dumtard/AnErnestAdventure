@@ -200,9 +200,17 @@ public class GameScreen implements Screen {
       }
 //      client.sendTCP(new Move());
 
-      for (Vector2 position : area.enemyPositions) {
-        Enemy e = new Enemy(position);
-        enemies.add(e);
+//      for (Vector2 position : area.enemyPositions) {
+      for (int i = 0; i < area.enemyPositions.size(); ++i) {
+        Vector2 position = area.enemyPositions.get(i);
+        
+        if (area.enemyType.get(i) == '#') {
+          Enemy e = new Enemy(position);
+          enemies.add(e);
+        } else if (area.enemyType.get(i) == '@') {
+          BomberEnemy e = new BomberEnemy(position);
+          enemies.add(e);
+        }
         //TODO enemy type
       }
       client.sendTCP(enemies);

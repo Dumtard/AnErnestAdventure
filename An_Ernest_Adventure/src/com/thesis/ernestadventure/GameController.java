@@ -419,6 +419,7 @@ public class GameController {
       players.get(ErnestGame.loginName).setIsFacingRight(false);
       Move move = new Move();
       move.name = ErnestGame.loginName;
+      move.position = players.get(ErnestGame.loginName).getPosition();
       move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
 
@@ -429,6 +430,7 @@ public class GameController {
       players.get(ErnestGame.loginName).setIsFacingRight(true);
       Move move = new Move();
       move.name = ErnestGame.loginName;
+      move.position = players.get(ErnestGame.loginName).getPosition();
       move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
     }
@@ -443,6 +445,7 @@ public class GameController {
         players.get(ErnestGame.loginName).setIsGrounded(false);
         Move move = new Move();
         move.name = ErnestGame.loginName;
+        move.position = players.get(ErnestGame.loginName).getPosition();
         move.velocity = players.get(ErnestGame.loginName).getVelocity();
         client.sendUDP(move);
       }
@@ -471,6 +474,7 @@ public class GameController {
       players.get(ErnestGame.loginName).setIsFacingRight(false);
       Move move = new Move();
       move.name = ErnestGame.loginName;
+      move.position = players.get(ErnestGame.loginName).getPosition();
       move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
 
@@ -481,6 +485,7 @@ public class GameController {
       players.get(ErnestGame.loginName).setIsFacingRight(true);
       Move move = new Move();
       move.name = ErnestGame.loginName;
+      move.position = players.get(ErnestGame.loginName).getPosition();
       move.velocity = players.get(ErnestGame.loginName).getVelocity();
       client.sendUDP(move);
 

@@ -58,94 +58,131 @@ public class ErnestServer {
     for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
       Player player = nameandplayer.getValue();
       
-      player.setPosition(player.getPosition().x + (player.getVelocity().x * delta),
-                         player.getPosition().y + (player.getVelocity().y * delta));
+      player.setPosition(player.getPosition().x + (player.getVelocity().x * delta * Tile.SIZE),
+                         player.getPosition().y + (player.getVelocity().y * delta * Tile.SIZE));
     }
     
   }
   
   private void enemyUpdate(float delta) {
-//    System.out.println("numEnemies: " + enemies.size());
     for (int i = 0; i < enemies.size(); ++i) {
       Enemy enemy = enemies.get(i);
       enemy.setPosition(enemy.getPosition().x + (enemy.getVelocity().x * delta),
                         enemy.getPosition().y + (enemy.getVelocity().y * delta));
       
-    Rectangle enemyRect = new Rectangle(enemy.getPosition().x+1, enemy.getPosition().y,
-        enemy.getWidth()-1, enemy.getHeight()-2);
+    Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
+        enemy.getWidth(), enemy.getHeight()-2);
     
     int tilePositionX = (int) (enemyRect.x / Tile.SIZE);
     int tilePositionY = (int) (enemyRect.y / Tile.SIZE);
     
-      if (enemy instanceof Enemy) {
+    if (enemy instanceof BomberEnemy) {
+      boolean sendUpdate = false;
+      if (area.tiles[tilePositionX+2][tilePositionY].collidable ||
+          area.tiles[tilePositionX][tilePositionY].collidable) {
+        if (enemy.getVelocity().x > 0) {
+          enemy.setPosition((tilePositionX) * Tile.SIZE, enemy.getPosition().y);
+        } else if ( enemy.getVelocity().x < 0) {
+          enemy.setPosition((tilePositionX+1) * Tile.SIZE, enemy.getPosition().y);
+        }
+        enemy.getVelocity().scl(-1);
+        enemy.setIsFacingRight(!enemy.getIsFacingRight());
+        sendUpdate = true;
+      }
+      
+      for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
+        Player player = nameandplayer.getValue();
+        if ((player.getPosition().x - ((BomberEnemy)enemy).bullet.x) > -16 &&
+            (player.getPosition().x - ((BomberEnemy)enemy).bullet.x) < 0) {
+          if (!((BomberEnemy)enemy).attacking) {
+            enemy.attack();
+            sendUpdate = true;
+          }
+        }
+      }
+      
+      //dropping bullets
+      if (((BomberEnemy)enemy).attacking) {
+        ((BomberEnemy)enemy).bullet.y += ((BomberEnemy)enemy).bulletVelocity*delta*Tile.SIZE;
+      } else {
+        ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+        ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+        if (((BomberEnemy)enemy).getIsFacingRight()) {
+          ((BomberEnemy)enemy).bullet.x += Tile.SIZE;
+        } else {
+          ((BomberEnemy)enemy).bullet.x += Tile.SIZE/2;
+        }
+      }
+      
+      //bullet collisions
+      Rectangle bulletRect = new Rectangle(((BomberEnemy)enemy).bullet.x+2, ((BomberEnemy)enemy).bullet.y,
+          12, 16);
+      
+      int bulletTilePositionX = (int)(((BomberEnemy)enemy).bullet.x / Tile.SIZE);
+      int bulletTilePositionY = (int)(((BomberEnemy)enemy).bullet.y / Tile.SIZE);
+      
+      if (bulletTilePositionY < 3) {
+        ((BomberEnemy)enemy).attacking = false;
+        sendUpdate = true;
+        bulletTilePositionY = 2;
+      }
+      
+      if (area.tiles[bulletTilePositionX][bulletTilePositionY].collidable) {
+        Rectangle tileRect = new Rectangle(area.tiles[bulletTilePositionX][bulletTilePositionY].x,
+                                           area.tiles[bulletTilePositionX][bulletTilePositionY].y,
+                                           32, 32);
+
+        if (bulletRect.overlaps(tileRect)) {
+          ((BomberEnemy)enemy).attacking = false;
+          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+          sendUpdate = true;
+        }
+      }
+      if (area.tiles[bulletTilePositionX+1][bulletTilePositionY].collidable) {
+        Rectangle tileRect2 = new Rectangle(area.tiles[bulletTilePositionX+1][bulletTilePositionY].x,
+                                            area.tiles[bulletTilePositionX+1][bulletTilePositionY].y,
+                                            32, 32);
+
+        if (bulletRect.overlaps(tileRect2)) {
+          ((BomberEnemy)enemy).attacking = false;
+          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
+          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
+          sendUpdate = true;
+        }
+      }
+      
+      if (sendUpdate) {
+        BomberEnemyUpdate update = new BomberEnemyUpdate();
+        update.index = i;
+        update.position = enemy.getPosition();
+        update.velocity = enemy.getVelocity();
+        update.attacking = ((BomberEnemy)enemy).attacking;
+        update.isFacingRight = ((BomberEnemy)enemy).getIsFacingRight();
+        server.sendToAllUDP(update);
+        
+      }
+      
+    }
+    else if (enemy instanceof Enemy) {
         if (tilePositionX+1 < area.width && area.tiles[tilePositionX+1][tilePositionY].collidable    ||
             area.tiles[tilePositionX][tilePositionY].collidable      ||
             tilePositionX+1 < area.width && !area.tiles[tilePositionX+1][tilePositionY-1].collidable ||
             !area.tiles[tilePositionX][tilePositionY-1].collidable) {
-  //        if (enemy.getVelocity().x > 0) {
-  //          enemy.setPosition((tilePositionX)*Tile.SIZE, enemy.getPosition().y);
-  //        } else if (enemy.getVelocity().x < 0) {
-  //          enemy.setPosition((tilePositionX+1)*Tile.SIZE, enemy.getPosition().y);
-  //        }
+          if (enemy.getVelocity().x > 0) {
+            enemy.setPosition((tilePositionX) * Tile.SIZE, enemy.getPosition().y);
+          } else if ( enemy.getVelocity().x < 0) {
+            enemy.setPosition((tilePositionX+1) * Tile.SIZE, enemy.getPosition().y);
+          }
           
           enemy.getVelocity().scl(-1);
           EnemyUpdate update = new EnemyUpdate();
           update.index = i;
           update.position = enemy.getPosition();
           update.velocity = enemy.getVelocity();
+          update.isFacingRight = enemy.getIsFacingRight();
           server.sendToAllUDP(update);
   //        System.out.println("Collision: (" + tilePositionX + ", " + tilePositionY + ")");
-        }
-        
-      } else if (enemy instanceof BomberEnemy) {
-        boolean sendUpdate = false;
-        if (area.tiles[tilePositionX+1][tilePositionY].collidable ||
-            area.tiles[tilePositionX][tilePositionY].collidable) {
-          enemy.getVelocity().scl(-1);
-          enemy.setIsFacingRight(!enemy.getIsFacingRight());
-          sendUpdate = true;
-        }
-        
-        if (enemy.getIsFacingRight()) {
-          tilePositionX++;
-        }
-        for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
-          Player player = nameandplayer.getValue();
-          int playerTilePositionX = (int) (player.getPosition().x / Tile.SIZE);
-          if (tilePositionX == playerTilePositionX) {
-            if (!((BomberEnemy)enemy).attacking) {
-              enemy.attack();
-              sendUpdate = true;
-            }
-          }
-        }
-        
-        //dropping bullets
-        if (((BomberEnemy)enemy).attacking) {
-          ((BomberEnemy)enemy).bullet.y += ((BomberEnemy)enemy).bulletVelocity;
-        } else {
-          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
-          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
-        }
-        
-        //bullet collisions
-        int bulletTilePositionX = (int)(((BomberEnemy)enemy).bullet.x / Tile.SIZE);
-        int bulletTilePositionY = (int)(((BomberEnemy)enemy).bullet.y / Tile.SIZE);
-        if (area.tiles[bulletTilePositionX][bulletTilePositionY-1].collidable) {
-          ((BomberEnemy)enemy).attacking = false;
-          ((BomberEnemy)enemy).bullet.x = enemy.getPosition().x;
-          ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
-          sendUpdate = true;
-        }
-        
-        if (sendUpdate) {
-          BomberEnemyUpdate update = new BomberEnemyUpdate();
-          update.index = i;
-          update.position = enemy.getPosition();
-          update.velocity = enemy.getVelocity();
-          update.attacking = ((BomberEnemy)enemy).attacking;
-          server.sendToAllUDP(update);
-          
         }
         
       }
