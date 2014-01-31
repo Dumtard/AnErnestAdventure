@@ -4,7 +4,7 @@ import com.badlogic.gdx.Game;
 
 public class ErnestGame extends Game {
   
-  public static final String loginName = "Tablet";
+  public static final String loginName = "Dumtard";
   public static float GAMETIME = 0;
 
   @Override

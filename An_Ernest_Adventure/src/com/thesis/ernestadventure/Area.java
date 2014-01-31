@@ -35,7 +35,6 @@ public class Area {
 //  }
 
   public void loadArea(int areaNumber) throws IOException {
-    Gdx.app.log("LOADING AREA","@@@@@@@@@@@@@@@@@@@");
     index = areaNumber;
     FileHandle handle;
     handle = Gdx.files.internal("areas/area" + areaNumber);

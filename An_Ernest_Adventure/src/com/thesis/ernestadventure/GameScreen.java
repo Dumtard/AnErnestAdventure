@@ -100,7 +100,6 @@ public class GameScreen implements Screen {
           
           return;
         } else if (object instanceof Stop) {
-//          Gdx.app.log("name ", ""+((Stop) object).name);
           players.get(((Stop) object).name).setPosition(((Stop) object).position);
           players.get(((Stop) object).name).setVelocity(0, 0);
           
@@ -111,8 +110,6 @@ public class GameScreen implements Screen {
           
         } else if (object instanceof Initialize) {
           if (area.height == 0) {
-            Gdx.app.log("recieved index: ", ""+ ((Initialize)object).area.intValue());
-            Gdx.app.log("loaded index: ", ""+ area.index);
             try {
               area.loadArea(((Initialize)object).area.intValue());
             } catch (IOException e) {
@@ -130,9 +127,17 @@ public class GameScreen implements Screen {
           players.clear();
           synchronized (players) {
             for (Map.Entry<String, Player> nameandplayer : ((Initialize)object).players.entrySet()) {
-              players.put(nameandplayer.getKey().substring(1), nameandplayer.getValue());
+              if ((nameandplayer.getKey().charAt(0) >= 48 &&
+                  nameandplayer.getKey().charAt(0) <= 57) ||
+                  (nameandplayer.getKey().charAt(0) >= 65 &&
+                  nameandplayer.getKey().charAt(0) <= 90) ||
+                  (nameandplayer.getKey().charAt(0) >= 97 &&
+                  nameandplayer.getKey().charAt(0) <= 122)) {
+                players.put(nameandplayer.getKey(), nameandplayer.getValue());
+              } else {
+                players.put(nameandplayer.getKey().substring(1), nameandplayer.getValue());
+              }
             }
-//            Gdx.app.log("players size: ", ""+players.size());
           }
           
         } else if (object instanceof ArrayList) {
@@ -144,9 +149,6 @@ public class GameScreen implements Screen {
           }
         } else if (object instanceof EnemyUpdate) {
           EnemyUpdate update = ((EnemyUpdate) object);
-//          Gdx.app.log("index", ""+update.index);
-//          Gdx.app.log("position", update.position.x + ", " + update.position.y);
-//          Gdx.app.log("velocity", update.velocity.x + ", " + update.velocity.y);
           
           try {
             enemies.get(update.index).setIsFacingRight(update.isFacingRight);
@@ -158,9 +160,6 @@ public class GameScreen implements Screen {
         
         } else if (object instanceof BomberEnemyUpdate) {
           BomberEnemyUpdate update = ((BomberEnemyUpdate) object);
-//        Gdx.app.log("index", ""+update.index);
-//        Gdx.app.log("position", update.position.x + ", " + update.position.y);
-//        Gdx.app.log("velocity", update.velocity.x + ", " + update.velocity.y);
         
         try {
           enemies.get(update.index).setIsFacingRight(update.isFacingRight);
@@ -173,7 +172,6 @@ public class GameScreen implements Screen {
           
         } else if (object instanceof Area) {
           if (area.index != ((Area) object).index) {
-            Gdx.app.log("FROM", "RECIEVE AREA");
             try {
               area.loadArea(((Area)object).index);
             } catch (IOException e) {
@@ -197,7 +195,6 @@ public class GameScreen implements Screen {
       }
       Thread.yield();
     }
-    Gdx.app.log("players size: ", ""+players.size());
     
     
     if (players.size() == 1) {
@@ -225,18 +222,7 @@ public class GameScreen implements Screen {
         //TODO enemy type
       }
       client.sendTCP(enemies);
-    } else {
-      Gdx.app.log("NOT SENDING LEVEL", "NOT SENDING LEVEL");
     }
-    
-//    try {
-//      area = new Area();
-//      area.loadArea(1);
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-    
-//    players.put(ErnestGame.loginName, new Player(area.getStart()));
     
     players.get(ErnestGame.loginName).setPosition(area.getStart());
     
@@ -244,13 +230,6 @@ public class GameScreen implements Screen {
     startPosition.name = ErnestGame.loginName;
     startPosition.position = players.get(ErnestGame.loginName).getPosition(); 
     client.sendTCP(startPosition);
-
-//    enemies.add(new Enemy(new Vector2(100, 200)));
-//    for (Vector2 position : area.enemyPositions) {
-//      Enemy e = new Enemy(position);
-//      enemies.add(e);
-//      //TODO enemy type
-//    }
     
     view = new View(ui, players, area, enemies);
     controller = new Controller(client, ui, players, area, enemies);
