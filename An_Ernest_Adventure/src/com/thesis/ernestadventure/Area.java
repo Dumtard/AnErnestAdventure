@@ -29,8 +29,13 @@ public class Area {
   public Vector2 getStart() {
     return playerStart;
   }
+//  
+//  public boolean loaded() {
+//    return tiles.length > 0;
+//  }
 
   public void loadArea(int areaNumber) throws IOException {
+    Gdx.app.log("LOADING AREA","@@@@@@@@@@@@@@@@@@@");
     index = areaNumber;
     FileHandle handle;
     handle = Gdx.files.internal("areas/area" + areaNumber);

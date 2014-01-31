@@ -114,6 +114,8 @@ public class GameView {
   private void renderArea(float delta) {
     for (int i = 0; i < area.height; i++) {
       for (int j = 0; j < area.width; j++) {
+        try {
+//        Gdx.app.log("tile: ", "(" + i + " ," + j + ")");
         if (area.tiles[j][i].id == '#') {
           floorSprite.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           floorSprite.draw(batch);
@@ -123,6 +125,9 @@ public class GameView {
         } else if (area.tiles[j][i].id == '@'){
           sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite3.draw(batch);
+        }
+        } catch (NullPointerException e) {
+          Gdx.app.log("invalid tile coordinates: ", i + " " + j);
         }
       }
     }
@@ -345,7 +350,7 @@ public class GameView {
     }
   }
   
-  public void render(float delta) {
+  synchronized public void render(float delta) {
     renderArea(delta);
     renderEnemies(delta);
     renderPlayers(delta);

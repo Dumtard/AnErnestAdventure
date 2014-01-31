@@ -69,8 +69,9 @@ public class GameScreen implements Screen {
     client.start();
     Network.register(client);
     try {
-      client.connect(5000, "localhost", 54555, 54555);  // Local Server
-//      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
+//      client.connect(5000, "localhost", 54555, 54555);  // Local Server
+      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
+//      client.connect(5000, "192.168.0.184", 54555, 54555);  // laptop Server
     } catch (IOException ex) {
       ex.printStackTrace();
     }
@@ -99,6 +100,7 @@ public class GameScreen implements Screen {
           
           return;
         } else if (object instanceof Stop) {
+//          Gdx.app.log("name ", ""+((Stop) object).name);
           players.get(((Stop) object).name).setPosition(((Stop) object).position);
           players.get(((Stop) object).name).setVelocity(0, 0);
           
@@ -108,10 +110,14 @@ public class GameScreen implements Screen {
               shoot((int)((Shoot) object).position.x, (int)((Shoot) object).position.y);
           
         } else if (object instanceof Initialize) {
-          try {
-            area.loadArea(((Initialize)object).area.intValue());
-          } catch (IOException e) {
-            e.printStackTrace();
+          if (area.height == 0) {
+            Gdx.app.log("recieved index: ", ""+ ((Initialize)object).area.intValue());
+            Gdx.app.log("loaded index: ", ""+ area.index);
+            try {
+              area.loadArea(((Initialize)object).area.intValue());
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
           }
           
           enemies.clear();
@@ -124,7 +130,7 @@ public class GameScreen implements Screen {
           players.clear();
           synchronized (players) {
             for (Map.Entry<String, Player> nameandplayer : ((Initialize)object).players.entrySet()) {
-              players.put(nameandplayer.getKey(), nameandplayer.getValue());
+              players.put(nameandplayer.getKey().substring(1), nameandplayer.getValue());
             }
 //            Gdx.app.log("players size: ", ""+players.size());
           }
@@ -166,10 +172,13 @@ public class GameScreen implements Screen {
         }
           
         } else if (object instanceof Area) {
-          try {
-            area.loadArea(((Area)object).index);
-          } catch (IOException e) {
-            e.printStackTrace();
+          if (area.index != ((Area) object).index) {
+            Gdx.app.log("FROM", "RECIEVE AREA");
+            try {
+              area.loadArea(((Area)object).index);
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
           }
         }
       }
@@ -188,6 +197,8 @@ public class GameScreen implements Screen {
       }
       Thread.yield();
     }
+    Gdx.app.log("players size: ", ""+players.size());
+    
     
     if (players.size() == 1) {
 //      client.setTimeout(20);
@@ -214,6 +225,8 @@ public class GameScreen implements Screen {
         //TODO enemy type
       }
       client.sendTCP(enemies);
+    } else {
+      Gdx.app.log("NOT SENDING LEVEL", "NOT SENDING LEVEL");
     }
     
 //    try {

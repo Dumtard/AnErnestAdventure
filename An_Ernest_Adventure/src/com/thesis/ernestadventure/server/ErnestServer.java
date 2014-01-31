@@ -159,7 +159,7 @@ public class ErnestServer {
         update.velocity = enemy.getVelocity();
         update.attacking = ((BomberEnemy)enemy).attacking;
         update.isFacingRight = ((BomberEnemy)enemy).getIsFacingRight();
-        server.sendToAllUDP(update);
+        server.sendToAllTCP(update);
         
       }
       
@@ -181,7 +181,7 @@ public class ErnestServer {
           update.position = enemy.getPosition();
           update.velocity = enemy.getVelocity();
           update.isFacingRight = enemy.getIsFacingRight();
-          server.sendToAllUDP(update);
+          server.sendToAllTCP(update);
   //        System.out.println("Collision: (" + tilePositionX + ", " + tilePositionY + ")");
         }
         
@@ -262,9 +262,9 @@ public class ErnestServer {
         } else if (object instanceof ArrayList) {
           enemies = (ArrayList<Enemy>) object;
           for (int i = 0; i < connections.size(); i++) {
-            if (c.getRemoteAddressUDP().getAddress() != 
-                connections.get(i).getRemoteAddressUDP().getAddress()) {
-              connections.get(i).sendUDP(enemies);
+            if (c.getRemoteAddressTCP().getAddress() != 
+                connections.get(i).getRemoteAddressTCP().getAddress()) {
+              connections.get(i).sendTCP(enemies);
             }
           }
         
@@ -273,9 +273,9 @@ public class ErnestServer {
           players.get(((Move) object).name).setVelocity(((Move) object).velocity);
           
           for (int i = 0; i < connections.size(); i++) {
-            if (c.getRemoteAddressUDP().getAddress() != 
-                connections.get(i).getRemoteAddressUDP().getAddress()) {
-              connections.get(i).sendUDP(object);
+            if (c.getRemoteAddressTCP().getAddress() != 
+                connections.get(i).getRemoteAddressTCP().getAddress()) {
+              connections.get(i).sendTCP(object);
             }
           }
           return;
@@ -285,17 +285,17 @@ public class ErnestServer {
           players.get(((Stop) object).name).setVelocity(new Vector2(0, 0));
           
           for (int i = 0; i < connections.size(); i++) {
-            if (c.getRemoteAddressUDP().getAddress() != 
-                connections.get(i).getRemoteAddressUDP().getAddress()) {
-              connections.get(i).sendUDP(object);
+            if (c.getRemoteAddressTCP().getAddress() != 
+                connections.get(i).getRemoteAddressTCP().getAddress()) {
+              connections.get(i).sendTCP(object);
             }
           }
           return;
         } else if (object instanceof Shoot) {
           for (int i = 0; i < connections.size(); i++) {
-            if (c.getRemoteAddressUDP().getAddress() !=
-                connections.get(i).getRemoteAddressUDP().getAddress()) {
-              connections.get(i).sendUDP(object);
+            if (c.getRemoteAddressTCP().getAddress() !=
+                connections.get(i).getRemoteAddressTCP().getAddress()) {
+              connections.get(i).sendTCP(object);
             }
           }
           
@@ -306,11 +306,11 @@ public class ErnestServer {
           area = ((Area)object);
           area.tiles = new Tile[area.width][area.height];
           area.width = 0;
-          areaIndex = area.index;
+          areaIndex = ((Area)object).index;
           
           for (int i = 0; i < connections.size(); i++) {
-            if (c.getRemoteAddressUDP().getAddress() !=
-                connections.get(i).getRemoteAddressUDP().getAddress()) {
+            if (c.getRemoteAddressTCP().getAddress() !=
+                connections.get(i).getRemoteAddressTCP().getAddress()) {
               connections.get(i).sendTCP(area);
             }
           }

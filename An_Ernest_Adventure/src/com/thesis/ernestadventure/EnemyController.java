@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.esotericsoftware.kryonet.Client;
+import com.thesis.ernestadventure.Network.EnemyUpdate;
 
 public class EnemyController {
   private final float GRAVITY = 0.5f;
@@ -25,7 +26,22 @@ public class EnemyController {
     enemy.setPosition(enemy.getPosition().x + (enemy.getVelocity().x * delta),
                       enemy.getPosition().y + (enemy.getVelocity().y * delta));
 
+    int tilePositionX = (int) (enemy.getPosition().x / Tile.SIZE);
+    int tilePositionY = (int) (enemy.getPosition().y / Tile.SIZE);
+    
     if (enemy instanceof BomberEnemy) {
+      
+      if (area.tiles[tilePositionX+2][tilePositionY].collidable ||
+          area.tiles[tilePositionX][tilePositionY].collidable) {
+        if (enemy.getVelocity().x > 0) {
+          enemy.setPosition((tilePositionX) * Tile.SIZE, enemy.getPosition().y);
+        } else if ( enemy.getVelocity().x < 0) {
+          enemy.setPosition((tilePositionX+1) * Tile.SIZE, enemy.getPosition().y);
+        }
+        enemy.getVelocity().scl(-1);
+        enemy.setIsFacingRight(!enemy.getIsFacingRight());
+      }
+      
       if (((BomberEnemy)enemy).attacking) {
         ((BomberEnemy)enemy).bullet.y  += ((BomberEnemy)enemy).bulletVelocity*delta*Tile.SIZE;
       } else {
@@ -37,7 +53,7 @@ public class EnemyController {
           ((BomberEnemy)enemy).bullet.x += Tile.SIZE/2;
         }
       }
-      
+     
       //bullet collisions   
       Rectangle bulletRect = new Rectangle(((BomberEnemy)enemy).bullet.x+2, ((BomberEnemy)enemy).bullet.y,
           12, 16);
@@ -71,6 +87,20 @@ public class EnemyController {
           ((BomberEnemy)enemy).bullet.y = enemy.getPosition().y;
         }
       }
+    } else if (enemy instanceof Enemy) {
+      if (tilePositionX+1 < area.width && area.tiles[tilePositionX+1][tilePositionY].collidable    ||
+          area.tiles[tilePositionX][tilePositionY].collidable      ||
+          tilePositionX+1 < area.width && !area.tiles[tilePositionX+1][tilePositionY-1].collidable ||
+          !area.tiles[tilePositionX][tilePositionY-1].collidable) {
+        if (enemy.getVelocity().x > 0) {
+          enemy.setPosition((tilePositionX) * Tile.SIZE, enemy.getPosition().y);
+        } else if ( enemy.getVelocity().x < 0) {
+          enemy.setPosition((tilePositionX+1) * Tile.SIZE, enemy.getPosition().y);
+        }
+        
+        enemy.getVelocity().scl(-1);
+      }
     }
+    
   }
 }
