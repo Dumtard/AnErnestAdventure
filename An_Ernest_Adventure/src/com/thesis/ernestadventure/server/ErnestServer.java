@@ -254,7 +254,7 @@ public class ErnestServer {
           }
         }
         
-        if (connections.size() == 0) {
+        if (connections.size() <= 0) {
           players.clear();
           enemies.clear();
           areaIndex = 1;

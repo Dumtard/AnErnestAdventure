@@ -17,7 +17,7 @@ public class Player {
   
   public ArrayList<Bullet> bullets;
   
-  public int health = 32;
+  public int health = 8;
   public long lastDamage = 0;
 
   public Player() {

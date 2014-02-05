@@ -34,9 +34,10 @@ public class GameScreen implements Screen {
   private ArrayList<Enemy> enemies;
 
   private Area area;
+  private ErnestGame game;
 
-  public GameScreen() {
-    
+  public GameScreen(ErnestGame game) {
+    this.game = game;
   }
   
   @Override
@@ -45,6 +46,11 @@ public class GameScreen implements Screen {
     Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
     
     controller.update(delta);
+//    System.out.println(players.get(ErnestGame.loginName).health);
+    if (players.get(ErnestGame.loginName).health <= 0) {
+      client.close();
+      game.setScreen(new StartScreen(game));
+    }
     view.render(delta);
     
     ErnestGame.GAMETIME += delta;
@@ -69,8 +75,8 @@ public class GameScreen implements Screen {
     client.start();
     Network.register(client);
     try {
-//      client.connect(5000, "localhost", 54555, 54555);  // Local Server
-      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
+      client.connect(5000, "localhost", 54555, 54555);  // Local Server
+//      client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
 //      client.connect(5000, "10.101.107.64", 54555, 54555);  // laptop Server
     } catch (IOException ex) {
       ex.printStackTrace();
