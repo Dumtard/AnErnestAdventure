@@ -5,7 +5,3 @@
 5: level linking
 6: unlockable abilities - double jump, multishot
 7: update sprites - first/second player, levels/layers/background, enemies/animations
-
-
-
-CURRENT: Add enemy2 loading in the level, test BomberEnemy

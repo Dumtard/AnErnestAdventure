@@ -9,14 +9,14 @@ import com.esotericsoftware.kryonet.Client;
 
 public class Controller implements InputProcessor {
   private UIController uiController;
-  private GameController gameController;
+  public GameController gameController;
   
   public Controller(Client client, UI ui, HashMap<String, Player> players, Area area, 
       ArrayList<Enemy> enemies) {
     Gdx.input.setInputProcessor(this);
     
     uiController = new UIController(ui, client, players);
-    gameController = new GameController(client, players, area, enemies);
+    gameController = new GameController(ui, client, players, area, enemies);
   }
 
   public void update(float delta) {

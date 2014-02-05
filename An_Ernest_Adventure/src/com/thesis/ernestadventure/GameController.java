@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
@@ -19,20 +20,25 @@ public class GameController {
 
   private HashMap<String, Player> players;
   private ArrayList<Enemy> enemies;
-  
+
   private EnemyController enemyController;
+  private UI ui;
 
   private Client client;
 
   private Area area;
 
-  public GameController(Client client, HashMap<String, Player> players,
+  public Sound shoot;
+
+  public GameController(UI ui, Client client, HashMap<String, Player> players,
       Area area, ArrayList<Enemy> enemies) {
+    this.ui = ui;
     this.client = client;
     this.players = players;
     this.area = area;
     this.enemies = enemies;
-    
+
+    shoot = Gdx.audio.newSound(Gdx.files.internal("sounds/shoot.wav"));
     enemyController = new EnemyController(client, players, area);
   }
 
@@ -42,77 +48,131 @@ public class GameController {
       playerCollision(player, nameandplayer.getKey());
 
       // Update Player location
-      player.setPosition(player.getPosition().x + (player.getVelocity().x * delta * Tile.SIZE),
-                         player.getPosition().y + (player.getVelocity().y * delta * Tile.SIZE));
-      
+      player
+          .setPosition(player.getPosition().x
+              + (player.getVelocity().x * delta * Tile.SIZE),
+              player.getPosition().y
+                  + (player.getVelocity().y * delta * Tile.SIZE));
+
       bulletCollision(player);
     }
-    
-    for(Enemy enemy : enemies) {
+
+    for (Enemy enemy : enemies) {
       enemyController.update(enemy, delta);
     }
   }
 
-  //TODO refactor collisions into function(tilepositionX, tilepositionY)
+  // TODO refactor collisions into function(tilepositionX, tilepositionY)
   synchronized private void playerCollision(Player player, String name) {
     try {
-      
+
       // Apply Gravity
-      player.setVelocity(player.getVelocity().x, player.getVelocity().y - GRAVITY);
-  
-      
-      Rectangle playerRect = new Rectangle(player.getPosition().x+1, player.getPosition().y,
-                                           player.getWidth()-1, player.getHeight()-2);
-      
+      player.setVelocity(player.getVelocity().x, player.getVelocity().y
+          - GRAVITY);
+
+      Rectangle playerRect = new Rectangle(player.getPosition().x + 1,
+          player.getPosition().y, player.getWidth() - 1, player.getHeight() - 2);
+
+
+      boolean takeDamage = false;
+
+      // collision with enemies
+      for (int i = 0; i < enemies.size(); ++i) {
+        Enemy enemy = enemies.get(i);
+
+        Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
+            enemy.getPosition().y, enemy.getWidth(), enemy.getHeight());
+
+        if (playerRect.overlaps(enemyRect)) {
+          
+          // damage player
+          if ((System.currentTimeMillis() - player.lastDamage) > 1000) {
+            takeDamage = true;
+          }
+
+        }
+        if (enemy instanceof BomberEnemy) {
+          // check enemy's bullets
+          Rectangle bulletRect = new Rectangle(
+              ((BomberEnemy) enemy).bullet.x, ((BomberEnemy) enemy).bullet.y,
+              16, 16);
+          if (playerRect.overlaps(bulletRect)) {
+            if ((System.currentTimeMillis() - player.lastDamage) > 1000) {
+              takeDamage = true;
+            }
+            
+            ((BomberEnemy) enemy).attacking = false;
+          }
+        }
+      }
+
+      if (takeDamage) {
+        ui.slider.setPosition(0);
+        
+        player.health--;
+        player.lastDamage = System.currentTimeMillis();
+
+        player.setVelocity(player.getVelocity().x * -1, 7);
+        Move move = new Move();
+        move.name = name;
+        move.position = player.getPosition();
+        move.velocity = player.getVelocity();
+        client.sendTCP(move);
+      }
+
       // Collision
       playerRect.x += player.getVelocity().x;
-      
+
       int tilePositionX = (int) (playerRect.x / Tile.SIZE);
       int tilePositionY = (int) (playerRect.y / Tile.SIZE);
-      
+
       // Right
       if (playerRect.x > player.getPosition().x) {
-  //      Gdx.app.log("position: ", "(" + tilePositionX + ", " + tilePositionY + ")");
-        if (area.tiles[tilePositionX+1][tilePositionY].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY].x,
-                                              area.tiles[tilePositionX+1][tilePositionY].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-          
+        // Gdx.app.log("position: ", "(" + tilePositionX + ", " + tilePositionY
+        // + ")");
+        if (area.tiles[tilePositionX + 1][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX + 1][tilePositionY].x,
+              area.tiles[tilePositionX + 1][tilePositionY].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x-Tile.SIZE, playerRect.y);
+            player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
-        } else if (area.tiles[tilePositionX+1][tilePositionY+1].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+1].x,
-                                              area.tiles[tilePositionX+1][tilePositionY+1].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX + 1][tilePositionY + 1].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX + 1][tilePositionY + 1].x,
+              area.tiles[tilePositionX + 1][tilePositionY + 1].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x-Tile.SIZE, playerRect.y);
+            player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
-        } else if (area.tiles[tilePositionX+1][tilePositionY+2].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+2].x,
-                                              area.tiles[tilePositionX+1][tilePositionY+2].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX + 1][tilePositionY + 2].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX + 1][tilePositionY + 2].x,
+              area.tiles[tilePositionX + 1][tilePositionY + 2].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x-Tile.SIZE, playerRect.y);
+            player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
-        
-        // Next Area
-        //TODO Make for ever side --It currently only enters levels where door is entered from the left
-        } if (area.tiles[tilePositionX+1][tilePositionY].exit && name.equals(ErnestGame.loginName)) {
+
+          // Next Area
+          // TODO Make for ever side --It currently only enters levels where
+          // door is entered from the left
+        }
+        if (area.tiles[tilePositionX + 1][tilePositionY].exit
+            && name.equals(ErnestGame.loginName)) {
           enemies.clear();
           try {
             area.loadArea(++area.index);
@@ -124,261 +184,256 @@ public class GameController {
             for (int i = 0; i < area.width; ++i) {
               client.sendTCP(area.tiles[i]);
             }
-            
+
             for (Vector2 position : area.enemyPositions) {
               Enemy e = new Enemy(position);
               enemies.add(e);
-              //TODO enemy type
+              // TODO enemy type
             }
             client.sendTCP(enemies);
-            
-            
+
             for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
-             nameandplayer.getValue().setPosition(area.getStart());
-             Stop newPosition = new Stop();
-             newPosition.name = nameandplayer.getKey();
-             newPosition.position = nameandplayer.getValue().getPosition();
-             client.sendUDP(newPosition);
+              nameandplayer.getValue().setPosition(area.getStart());
+              Stop newPosition = new Stop();
+              newPosition.name = nameandplayer.getKey();
+              newPosition.position = nameandplayer.getValue().getPosition();
+              client.sendUDP(newPosition);
             }
-            
+
             player.bullets.clear();
           } catch (IOException e) {
             e.printStackTrace();
           }
           return;
         }
-  
-      // Left
+
+        // Left
       } else if (playerRect.x < player.getPosition().x) {
         if (area.tiles[tilePositionX][tilePositionY].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,
-                                              area.tiles[tilePositionX][tilePositionY].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-          
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX][tilePositionY].x,
+              area.tiles[tilePositionX][tilePositionY].y, Tile.SIZE, Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x+Tile.SIZE+2, playerRect.y);
+            player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
-        } else if (area.tiles[tilePositionX][tilePositionY+1].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+1].x,
-                                              area.tiles[tilePositionX][tilePositionY+1].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX][tilePositionY + 1].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX][tilePositionY + 1].x,
+              area.tiles[tilePositionX][tilePositionY + 1].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x+Tile.SIZE+2, playerRect.y);
+            player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
-        } else if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+2].x,
-                                              area.tiles[tilePositionX][tilePositionY+2].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX][tilePositionY + 2].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX][tilePositionY + 2].x,
+              area.tiles[tilePositionX][tilePositionY + 2].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(blockRect.x+Tile.SIZE+2, playerRect.y);
+            player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
         }
       }
-  
+
       playerRect.x = player.getPosition().x;
       playerRect.y += player.getVelocity().y;
-      
+
       tilePositionX = (int) (playerRect.x / Tile.SIZE);
       tilePositionY = (int) (playerRect.y / Tile.SIZE);
-      
+
       // Bottom
       if (playerRect.y < player.getPosition().y) {
         if (area.tiles[tilePositionX][tilePositionY].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY].x,
-                                              area.tiles[tilePositionX][tilePositionY].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-          
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX][tilePositionY].x,
+              area.tiles[tilePositionX][tilePositionY].y, Tile.SIZE, Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(playerRect.x, blockRect.y+Tile.SIZE);
+            player.setPosition(playerRect.x, blockRect.y + Tile.SIZE);
             player.setVelocity(player.getVelocity().x, 0);
             player.setIsGrounded(true);
           }
-        } else if (area.tiles[tilePositionX+1][tilePositionY].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY].x,
-                                              area.tiles[tilePositionX+1][tilePositionY].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX + 1][tilePositionY].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX + 1][tilePositionY].x,
+              area.tiles[tilePositionX + 1][tilePositionY].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(playerRect.x, blockRect.y+Tile.SIZE);
+            player.setPosition(playerRect.x, blockRect.y + Tile.SIZE);
             player.setVelocity(player.getVelocity().x, 0);
             player.setIsGrounded(true);
           }
         }
-  
-      // Top
+
+        // Top
       } else if (playerRect.y > player.getPosition().y) {
-        if (area.tiles[tilePositionX][tilePositionY+2].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX][tilePositionY+2].x,
-                                              area.tiles[tilePositionX][tilePositionY+2].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-          
+        if (area.tiles[tilePositionX][tilePositionY + 2].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX][tilePositionY + 2].x,
+              area.tiles[tilePositionX][tilePositionY + 2].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(playerRect.x, blockRect.y-playerRect.height);
+            player.setPosition(playerRect.x, blockRect.y - playerRect.height);
             player.setVelocity(player.getVelocity().x, 0);
           }
-        } else if (area.tiles[tilePositionX+1][tilePositionY+2].collidable) {
-          Rectangle blockRect = new Rectangle(area.tiles[tilePositionX+1][tilePositionY+2].x,
-                                              area.tiles[tilePositionX+1][tilePositionY+2].y,
-                                              Tile.SIZE,
-                                              Tile.SIZE);
-  
+        } else if (area.tiles[tilePositionX + 1][tilePositionY + 2].collidable) {
+          Rectangle blockRect = new Rectangle(
+              area.tiles[tilePositionX + 1][tilePositionY + 2].x,
+              area.tiles[tilePositionX + 1][tilePositionY + 2].y, Tile.SIZE,
+              Tile.SIZE);
+
           if (playerRect.overlaps(blockRect)) {
-            player.setPosition(playerRect.x, blockRect.y-playerRect.height);
+            player.setPosition(playerRect.x, blockRect.y - playerRect.height);
             player.setVelocity(player.getVelocity().x, 0);
-           }
-        } 
+          }
+        }
       }
       playerRect.y = player.getPosition().y;
-      
+
     } catch (ArrayIndexOutOfBoundsException e) {
       player.setPosition(area.getStart());
     }
   }
-  
-  
-  
-  private void bulletCollision(Player player) {
+
+  synchronized private void bulletCollision(Player player) {
     // Bullets Collision
     synchronized (player.bullets) {
       Iterator<Bullet> i = player.bullets.iterator();
       while (i.hasNext()) {
         Bullet bullet = i.next();
-  
+
         // Outside of area
-        if (bullet.position.x > (area.width*32) ||
-            bullet.position.y > (area.height*32) ||
-            bullet.position.x < 0 ||
-            bullet.position.y < 0) {
+        if (bullet.position.x > (area.width * 32)
+            || bullet.position.y > (area.height * 32) || bullet.position.x < 0
+            || bullet.position.y < 0) {
           i.remove();
         }
-        
-        Rectangle bulletRect = new Rectangle(bullet.position.x, bullet.position.y, bullet.size, bullet.size);
+
+        Rectangle bulletRect = new Rectangle(bullet.position.x,
+            bullet.position.y, bullet.size, bullet.size);
         bulletRect.x += bullet.velocity.x;
-        
+
         // Get bullets current square
         int bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
         int bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
-        
+
         // Right
         if (bulletRect.x > bullet.position.x) {
-          if (area.tiles[bulletPositionX+1][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY].x,
-                                                area.tiles[bulletPositionX+1][bulletPositionY].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }  
-          } else if (area.tiles[bulletPositionX+1][bulletPositionY+1].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY+1].x,
-                                                area.tiles[bulletPositionX+1][bulletPositionY+1].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }  
-          }
-          
-        // Left
-        } else if (bulletRect.x < bullet.position.x) {
-          if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY].x,
-                                                area.tiles[bulletPositionX][bulletPositionY].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+          if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX + 1][bulletPositionY].x,
+                area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
+                Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
             }
-          } else if (area.tiles[bulletPositionX][bulletPositionY+1].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY+1].x,
-                                                area.tiles[bulletPositionX][bulletPositionY+1].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+          } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
+                area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
+                Tile.SIZE, Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
-            }  
+            }
+          }
+
+          // Left
+        } else if (bulletRect.x < bullet.position.x) {
+          if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX][bulletPositionY].x,
+                area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
+                Tile.SIZE);
+            if (bulletRect.overlaps(blockRect)) {
+              i.remove();
+              break;
+            }
+          } else if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX][bulletPositionY + 1].x,
+                area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
+                Tile.SIZE);
+            if (bulletRect.overlaps(blockRect)) {
+              i.remove();
+              break;
+            }
           }
         }
-          
+
         bulletRect.x = bullet.position.x;
         bulletRect.y += bullet.velocity.y;
-        
+
         // Get bullets current square
         bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
         bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
-        
+
         // Top
         if (bulletRect.y > bullet.position.y) {
-          if (area.tiles[bulletPositionX][bulletPositionY+1].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY+1].x,
-                                                area.tiles[bulletPositionX][bulletPositionY+1].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+          if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX][bulletPositionY + 1].x,
+                area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
+                Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
             }
-          } else if (area.tiles[bulletPositionX+1][bulletPositionY+1].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY+1].x,
-                                                area.tiles[bulletPositionX+1][bulletPositionY+1].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+          } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
+                area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
+                Tile.SIZE, Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
             }
           }
-          
-        // Bottom
+
+          // Bottom
         } else if (bulletRect.y < bullet.position.y) {
           if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX][bulletPositionY].x,
-                                                area.tiles[bulletPositionX][bulletPositionY].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX][bulletPositionY].x,
+                area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
+                Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
             }
-          } else if (area.tiles[bulletPositionX+1][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(area.tiles[bulletPositionX+1][bulletPositionY].x,
-                                                area.tiles[bulletPositionX+1][bulletPositionY].y,
-                                                Tile.SIZE,
-                                                Tile.SIZE);
+          } else if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
+            Rectangle blockRect = new Rectangle(
+                area.tiles[bulletPositionX + 1][bulletPositionY].x,
+                area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
+                Tile.SIZE);
             if (bulletRect.overlaps(blockRect)) {
               i.remove();
               break;
             }
           }
         }
-        
+
         Iterator<Enemy> e = enemies.iterator();
         while (e.hasNext()) {
           Enemy enemy = e.next();
-          Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
-                                              enemy.getWidth(), enemy.getHeight());
-          
+          Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
+              enemy.getPosition().y, enemy.getWidth(), enemy.getHeight());
+
           if (bulletRect.overlaps(enemyRect)) {
             e.remove();
             i.remove();
@@ -388,23 +443,26 @@ public class GameController {
         }
       }
     }
-    
-    synchronized(player.bullets) {
+
+    synchronized (player.bullets) {
       // Move bullets
       for (Bullet bullet : player.bullets) {
-        bullet.position.add(bullet.velocity);
+        if (bullet.velocity.y == 0) bullet.velocity.y += 0.01f;
+        bullet.position.x += bullet.velocity.x;
+        bullet.position.y += bullet.velocity.y;
+//        bullet.position.add(bullet.velocity);
       }
-      
+
       // Limit number of bullets
-      if (player.bullets.size() > 5) {
+      if (player.bullets.size() > player.MAXBULLETS) {
         player.bullets.remove(0);
       }
     }
   }
-  
+
   public void keyDown(int keycode) {
-//    Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
-    
+    // Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
+
     // Left Arrow && Right Arrow
     if (Gdx.input.isKeyPressed(21) && Gdx.input.isKeyPressed(22)) {
       players.get(ErnestGame.loginName).setVelocity(
@@ -457,7 +515,7 @@ public class GameController {
   }
 
   public void keyUp(int keycode) {
-//     Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
+    // Gdx.app.log("Key", "" + Gdx.input.isKeyPressed(21));
 
     // Left Arrow && Right Arrow
     if (Gdx.input.isKeyPressed(21) && Gdx.input.isKeyPressed(22)) {
@@ -502,25 +560,25 @@ public class GameController {
       client.sendUDP(stop);
     }
   }
-  
+
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
     players.get(ErnestGame.loginName).shoot(screenX, screenY);
-    
+    shoot.play();
+
     Shoot shoot = new Shoot();
     shoot.name = ErnestGame.loginName;
     shoot.position = new Vector2(screenX, screenY);
     client.sendUDP(shoot);
     return false;
   }
-  
-  
+
   public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-//    Gdx.app.log("TouchUp", "Game Controller");
+    // Gdx.app.log("TouchUp", "Game Controller");
     return false;
   }
-  
+
   public boolean touchDragged(int screenX, int screenY, int pointer) {
-//    Gdx.app.log("TouchDragged", "Game Controller");
+    // Gdx.app.log("TouchDragged", "Game Controller");
     return false;
   }
 }

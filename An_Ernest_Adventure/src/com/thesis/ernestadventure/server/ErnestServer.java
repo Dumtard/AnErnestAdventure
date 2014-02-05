@@ -18,6 +18,7 @@ import com.thesis.ernestadventure.Enemy;
 import com.thesis.ernestadventure.Network;
 import com.thesis.ernestadventure.Network.BomberEnemyUpdate;
 import com.thesis.ernestadventure.Network.Connect;
+import com.thesis.ernestadventure.Network.Disconnect;
 import com.thesis.ernestadventure.Network.EnemyUpdate;
 import com.thesis.ernestadventure.Network.Initialize;
 import com.thesis.ernestadventure.Network.Move;
@@ -60,8 +61,48 @@ public class ErnestServer {
       
       player.setPosition(player.getPosition().x + (player.getVelocity().x * delta * Tile.SIZE),
                          player.getPosition().y + (player.getVelocity().y * delta * Tile.SIZE));
-    }
-    
+      
+      Rectangle playerRect = new Rectangle(player.getPosition().x + 1, player.getPosition().y,
+                                           player.getWidth() - 1, player.getHeight() - 2);
+      
+      boolean takeDamage = false;
+      
+      //collision with enemies
+      for (int i = 0; i < enemies.size(); ++i) {
+        Enemy enemy = enemies.get(i);
+        
+        Rectangle enemyRect = new Rectangle(enemy.getPosition().x, enemy.getPosition().y,
+                                            enemy.getWidth(), enemy.getHeight());
+        
+        if (playerRect.overlaps(enemyRect)) {
+          //damage player
+          if (System.currentTimeMillis()-player.lastDamage < 1000) {
+            takeDamage = true;
+          }
+          
+        }
+        if (enemy instanceof BomberEnemy) {
+          //check enemy's bullets
+          Rectangle bulletRect = new Rectangle(((BomberEnemy) enemy).bullet.x, 
+              ((BomberEnemy) enemy).bullet.y,
+              16, 16);
+          if (playerRect.overlaps(bulletRect)) {
+            if ((System.currentTimeMillis() - player.lastDamage) > 1000) {
+              takeDamage = true;
+            }
+            
+            ((BomberEnemy) enemy).attacking = false;
+          }
+        }
+      }
+      
+      if (takeDamage) {
+        player.health--;
+        player.lastDamage = System.currentTimeMillis();
+
+        player.setVelocity(player.getVelocity().x * -1, 7);
+      }
+    }  
   }
   
   private void enemyUpdate(float delta) {
@@ -182,7 +223,6 @@ public class ErnestServer {
           update.velocity = enemy.getVelocity();
           update.isFacingRight = enemy.getIsFacingRight();
           server.sendToAllTCP(update);
-  //        System.out.println("Collision: (" + tilePositionX + ", " + tilePositionY + ")");
         }
         
       }
@@ -201,10 +241,15 @@ public class ErnestServer {
         for (int i = 0; i < connections.size(); i++) {
           if (connections.get(i) == c) {
             disconnected = connectionNames.get(i);
+            System.out.println("Player " + disconnected + " disconnected");
+            
             players.remove(disconnected);
             connections.remove(i);
             connectionNames.remove(i);
-            //TODO Send disconnect
+            
+            Disconnect discoSignal = new Disconnect();
+            discoSignal.name = disconnected;
+            server.sendToAllTCP(discoSignal);
             break;
           }
         }
@@ -214,13 +259,9 @@ public class ErnestServer {
           enemies.clear();
           areaIndex = 1;
         }
-//        Disconnect disconnect = new Disconnect();
-//        disconnect.name = disconnected;
-//        server.sendToAllTCP(disconnect);
       }
       
       public void received(Connection c, Object object) {
-//        System.out.println(object.getClass().getName());
         if (object instanceof Connect) {
           System.out.println(((Connect) object).name + " has logged on.");
           connections.add(c);

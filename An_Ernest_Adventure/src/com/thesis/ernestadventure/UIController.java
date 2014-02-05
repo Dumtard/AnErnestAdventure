@@ -47,9 +47,10 @@ public class UIController {
     // Set Position of Slider
     if (screenX < (Gdx.graphics.getWidth() / 4)+10 &&
         screenX > 0) {
-      movePointer = pointer;
-      
-      ui.slider.setPosition(((screenX/((Gdx.graphics.getWidth() / 4.0f)+10))*2)-1);
+      if ((System.currentTimeMillis() - players.get(ErnestGame.loginName).lastDamage) > 250) {
+        movePointer = pointer;
+        ui.slider.setPosition(((screenX/((Gdx.graphics.getWidth() / 4.0f)+10))*2)-1);
+      }
     }
     
     if (screenX < ((Gdx.graphics.getWidth()/2) + 100) &&
@@ -103,7 +104,9 @@ public class UIController {
     // Set Position of Slider
     if (screenX < (Gdx.graphics.getWidth() / 4)+10 &&
         screenX > 0) {
-      ui.slider.setPosition(((screenX/((Gdx.graphics.getWidth() / 4.0f)+10))*2)-1);
+      if ((System.currentTimeMillis() - players.get(ErnestGame.loginName).lastDamage) > 250) {
+        ui.slider.setPosition(((screenX/((Gdx.graphics.getWidth() / 4.0f)+10))*2)-1);
+      }
     }
     return false;
   }

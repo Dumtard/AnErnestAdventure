@@ -71,7 +71,7 @@ public class GameScreen implements Screen {
     try {
 //      client.connect(5000, "localhost", 54555, 54555);  // Local Server
       client.connect(5000, "dumtard.com", 54555, 54555); // Charles Server
-//      client.connect(5000, "192.168.0.184", 54555, 54555);  // laptop Server
+//      client.connect(5000, "10.101.107.64", 54555, 54555);  // laptop Server
     } catch (IOException ex) {
       ex.printStackTrace();
     }
@@ -81,12 +81,10 @@ public class GameScreen implements Screen {
 //        System.out.println(object.getClass().getName());
         
         if (object instanceof Connect) {
-          System.out.println(((Connect) object).name + " has joined");
           players.put(((Connect) object).name, new Player(area.getStart()));
 
           return;
         } else if (object instanceof Disconnect) {
-          System.out.println(((Disconnect) object).name + " has left");
           players.remove(((Disconnect) object).name);
           
           return;
@@ -107,6 +105,8 @@ public class GameScreen implements Screen {
         } else if (object instanceof Shoot) {
           players.get(((Shoot) object).name).
               shoot((int)((Shoot) object).position.x, (int)((Shoot) object).position.y);
+          
+          controller.gameController.shoot.play();
           
         } else if (object instanceof Initialize) {
           if (area.height == 0) {

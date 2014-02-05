@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import com.badlogic.gdx.math.Vector2;
 
 public class Player {
+  public static int MAXBULLETS = 100;
+  
   private Vector2 position;
   private Vector2 velocity;
   private int width;
@@ -14,6 +16,9 @@ public class Player {
   private boolean isFacingRight;
   
   public ArrayList<Bullet> bullets;
+  
+  public int health = 32;
+  public long lastDamage = 0;
 
   public Player() {
     position = new Vector2(100, 300);
