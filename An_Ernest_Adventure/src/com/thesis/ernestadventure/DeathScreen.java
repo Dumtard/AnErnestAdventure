@@ -8,18 +8,18 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class StartScreen implements Screen, InputProcessor {
+public class DeathScreen implements Screen, InputProcessor {
   ErnestGame game;
   
   OrthographicCamera camera;
   private SpriteBatch batch;
   
-  private TextureRegion startImage;
+  private TextureRegion deathImage;
   
   int width = Gdx.graphics.getWidth();
   int height = Gdx.graphics.getHeight();
   
-  public StartScreen(ErnestGame game) {
+  public DeathScreen(ErnestGame game) {
     this.game = game;
     
     width = Gdx.graphics.getWidth();
@@ -32,8 +32,8 @@ public class StartScreen implements Screen, InputProcessor {
     
     Gdx.input.setInputProcessor(this);
     
-    startImage = new TextureRegion(
-        new Texture(Gdx.files.internal("Menu.png")), 
+    deathImage = new TextureRegion(
+        new Texture(Gdx.files.internal("Death.png")), 
         0, 0, 640, 400);
   }
   
@@ -45,7 +45,7 @@ public class StartScreen implements Screen, InputProcessor {
     batch.begin();
     
     //draw start screen
-    batch.draw(startImage, 0, 0, 1200, 720);
+    batch.draw(deathImage, 0, 0, 1200, 720);
 
     batch.end();
     
@@ -107,11 +107,7 @@ public class StartScreen implements Screen, InputProcessor {
 
   @Override
   public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-//    System.out.println("(" + screenX + ", " + screenY + ")");
-    if (screenX > 481 && screenX < 637 &&
-        screenY > 472 && screenY < 551) {
-      game.setScreen(new GameScreen(game));
-    }
+    game.setScreen(new StartScreen(game));
     return false;
   }
 

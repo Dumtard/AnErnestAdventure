@@ -24,6 +24,7 @@ public class Network {
     kryo.register(ArrayList.class);
     kryo.register(String.class);
     kryo.register(Integer.class);
+    kryo.register(Integer[].class);
     kryo.register(Float.class);
     kryo.register(Boolean.class);    
     kryo.register(Enemy.class);

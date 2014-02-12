@@ -14,6 +14,7 @@ public class Area {
   public Integer width = 0;
   public Integer height = 0;
   public Tile[][] tiles;
+  public Integer[] warps = new Integer[10];
   
   public Vector2 playerStart;
   
@@ -51,7 +52,10 @@ public class Area {
           width = Integer.parseInt(lineSplit[1]);
         } else if (lineSplit[0].equals("Height:")) {
           height = Integer.parseInt(lineSplit[1]);
-        } 
+        } else if (lineSplit[0].charAt(0) >= '0' && 
+                   lineSplit[0].charAt(0) <= '9') {
+          warps[(int)(lineSplit[0].charAt(0)) - (int)('0')] = Integer.parseInt(lineSplit[1]);
+        }
         
       } else {
         tiles = new Tile[width][height];
@@ -101,9 +105,10 @@ public class Area {
               } else if (line.charAt(j) == '@') {
                 playerStart = new Vector2(j*32, i*32);
                 tiles[j][i].collidable = false;
-              } else if (line.charAt(j) == '$') {
+              } else if (line.charAt(j) >= '0' && 
+                         line.charAt(j) <= '9') {
                 tiles[j][i].collidable = false;
-                tiles[j][i].exit = true;
+                tiles[j][i].exit = (int)(line.charAt(j)) - (int)('0');
               } else {
                 tiles[j][i].collidable = false;
               }

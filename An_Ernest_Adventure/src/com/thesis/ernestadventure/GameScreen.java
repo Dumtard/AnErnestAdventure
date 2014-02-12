@@ -49,7 +49,7 @@ public class GameScreen implements Screen {
 //    System.out.println(players.get(ErnestGame.loginName).health);
     if (players.get(ErnestGame.loginName).health <= 0) {
       client.close();
-      game.setScreen(new StartScreen(game));
+      game.setScreen(new DeathScreen(game));
     }
     view.render(delta);
     
@@ -225,7 +225,6 @@ public class GameScreen implements Screen {
           BomberEnemy e = new BomberEnemy(position);
           enemies.add(e);
         }
-        //TODO enemy type
       }
       client.sendTCP(enemies);
     }

@@ -2,6 +2,7 @@ package com.thesis.ernestadventure;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -168,14 +169,14 @@ public class GameController {
           }
 
           // Next Area
-          // TODO Make for ever side --It currently only enters levels where
-          // door is entered from the left
         }
-        if (area.tiles[tilePositionX + 1][tilePositionY].exit
-            && name.equals(ErnestGame.loginName)) {
+        if (area.tiles[tilePositionX + 1][tilePositionY].exit >= 0 &&
+            name.equals(ErnestGame.loginName)) {
+          int warpLocation = area.warps[area.tiles[tilePositionX + 1][tilePositionY].exit];
           enemies.clear();
           try {
-            area.loadArea(++area.index);
+            area.loadArea(warpLocation);
+            area.index = warpLocation;
             Area a = new Area();
             a.width = area.width;
             a.height = area.height;
@@ -185,10 +186,16 @@ public class GameController {
               client.sendTCP(area.tiles[i]);
             }
 
-            for (Vector2 position : area.enemyPositions) {
-              Enemy e = new Enemy(position);
-              enemies.add(e);
-              // TODO enemy type
+            for (int i = 0; i < area.enemyPositions.size(); ++i) {
+              Vector2 position = area.enemyPositions.get(i);
+              
+              if (area.enemyType.get(i) == '#') {
+                Enemy e = new Enemy(position);
+                enemies.add(e);
+              } else if (area.enemyType.get(i) == '@') {
+                BomberEnemy e = new BomberEnemy(position);
+                enemies.add(e);
+              }
             }
             client.sendTCP(enemies);
 
@@ -244,6 +251,51 @@ public class GameController {
               player.setVelocity(0, player.getVelocity().y);
             }
           }
+        }
+        
+        if (area.tiles[tilePositionX][tilePositionY].exit >= 0 &&
+            name.equals(ErnestGame.loginName)) {
+          System.out.println("HIT LOADING ZONE");
+          int warpLocation = area.warps[area.tiles[tilePositionX][tilePositionY].exit];
+          enemies.clear();
+          try {
+            area.loadArea(warpLocation);
+            area.index = warpLocation;
+            Area a = new Area();
+            a.width = area.width;
+            a.height = area.height;
+            a.index = area.index;
+            client.sendTCP(a);
+            for (int i = 0; i < area.width; ++i) {
+              client.sendTCP(area.tiles[i]);
+            }
+
+            for (int i = 0; i < area.enemyPositions.size(); ++i) {
+              Vector2 position = area.enemyPositions.get(i);
+              
+              if (area.enemyType.get(i) == '#') {
+                Enemy e = new Enemy(position);
+                enemies.add(e);
+              } else if (area.enemyType.get(i) == '@') {
+                BomberEnemy e = new BomberEnemy(position);
+                enemies.add(e);
+              }
+            }
+            client.sendTCP(enemies);
+
+            for (Map.Entry<String, Player> nameandplayer : players.entrySet()) {
+              nameandplayer.getValue().setPosition(area.getStart());
+              Stop newPosition = new Stop();
+              newPosition.name = nameandplayer.getKey();
+              newPosition.position = nameandplayer.getValue().getPosition();
+              client.sendUDP(newPosition);
+            }
+
+            player.bullets.clear();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          return;
         }
       }
 
@@ -311,152 +363,162 @@ public class GameController {
 
   synchronized private void bulletCollision(Player player) {
     // Bullets Collision
-    synchronized (player.bullets) {
-      Iterator<Bullet> i = player.bullets.iterator();
-      while (i.hasNext()) {
-        Bullet bullet = i.next();
-
-        // Outside of area
-        if (bullet.position.x > (area.width * 32)
-            || bullet.position.y > (area.height * 32) || bullet.position.x < 0
-            || bullet.position.y < 0) {
-          i.remove();
-        }
-
-        Rectangle bulletRect = new Rectangle(bullet.position.x,
-            bullet.position.y, bullet.size, bullet.size);
-        bulletRect.x += bullet.velocity.x;
-
-        // Get bullets current square
-        int bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
-        int bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
-
-        // Right
-        if (bulletRect.x > bullet.position.x) {
-          if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX + 1][bulletPositionY].x,
-                area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
-                area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
-                Tile.SIZE, Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          }
-
-          // Left
-        } else if (bulletRect.x < bullet.position.x) {
-          if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX][bulletPositionY].x,
-                area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          } else if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX][bulletPositionY + 1].x,
-                area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          }
-        }
-
-        bulletRect.x = bullet.position.x;
-        bulletRect.y += bullet.velocity.y;
-
-        // Get bullets current square
-        bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
-        bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
-
-        // Top
-        if (bulletRect.y > bullet.position.y) {
-          if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX][bulletPositionY + 1].x,
-                area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
-                area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
-                Tile.SIZE, Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          }
-
-          // Bottom
-        } else if (bulletRect.y < bullet.position.y) {
-          if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX][bulletPositionY].x,
-                area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          } else if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
-            Rectangle blockRect = new Rectangle(
-                area.tiles[bulletPositionX + 1][bulletPositionY].x,
-                area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
-                Tile.SIZE);
-            if (bulletRect.overlaps(blockRect)) {
-              i.remove();
-              break;
-            }
-          }
-        }
-
-        Iterator<Enemy> e = enemies.iterator();
-        while (e.hasNext()) {
-          Enemy enemy = e.next();
-          Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
-              enemy.getPosition().y, enemy.getWidth(), enemy.getHeight());
-
-          if (bulletRect.overlaps(enemyRect)) {
-            e.remove();
+    try {
+      synchronized (player.bullets) {
+        Iterator<Bullet> i = player.bullets.iterator();
+        while (i.hasNext()) {
+          Bullet bullet = i.next();
+  
+          // Outside of area
+          if (bullet.position.x > (area.width * 32)
+              || bullet.position.y > (area.height * 32) || bullet.position.x < 0
+              || bullet.position.y < 0) {
             i.remove();
-            client.sendTCP(enemies);
-            break;
+          }
+  
+          Rectangle bulletRect = new Rectangle(bullet.position.x,
+              bullet.position.y, bullet.size, bullet.size);
+          bulletRect.x += bullet.velocity.x;
+  
+          // Get bullets current square
+          int bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
+          int bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
+  
+          // Right
+          if (bulletRect.x > bullet.position.x) {
+            if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX + 1][bulletPositionY].x,
+                  area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
+                  area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
+                  Tile.SIZE, Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            }
+  
+            // Left
+          } else if (bulletRect.x < bullet.position.x) {
+            if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX][bulletPositionY].x,
+                  area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            } else if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX][bulletPositionY + 1].x,
+                  area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            }
+          }
+  
+          bulletRect.x = bullet.position.x;
+          bulletRect.y += bullet.velocity.y;
+  
+          // Get bullets current square
+          bulletPositionX = (int) (bulletRect.x / Tile.SIZE);
+          bulletPositionY = (int) (bulletRect.y / Tile.SIZE);
+  
+          // Top
+          if (bulletRect.y > bullet.position.y) {
+            if (area.tiles[bulletPositionX][bulletPositionY + 1].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX][bulletPositionY + 1].x,
+                  area.tiles[bulletPositionX][bulletPositionY + 1].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            } else if (area.tiles[bulletPositionX + 1][bulletPositionY + 1].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX + 1][bulletPositionY + 1].x,
+                  area.tiles[bulletPositionX + 1][bulletPositionY + 1].y,
+                  Tile.SIZE, Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            }
+  
+            // Bottom
+          } else if (bulletRect.y < bullet.position.y) {
+            if (area.tiles[bulletPositionX][bulletPositionY].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX][bulletPositionY].x,
+                  area.tiles[bulletPositionX][bulletPositionY].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            } else if (area.tiles[bulletPositionX + 1][bulletPositionY].collidable) {
+              Rectangle blockRect = new Rectangle(
+                  area.tiles[bulletPositionX + 1][bulletPositionY].x,
+                  area.tiles[bulletPositionX + 1][bulletPositionY].y, Tile.SIZE,
+                  Tile.SIZE);
+              if (bulletRect.overlaps(blockRect)) {
+                i.remove();
+                break;
+              }
+            }
+          }
+  
+          Iterator<Enemy> e = enemies.iterator();
+          while (e.hasNext()) {
+            Enemy enemy = e.next();
+            Rectangle enemyRect = new Rectangle(enemy.getPosition().x,
+                enemy.getPosition().y, enemy.getWidth(), enemy.getHeight());
+  
+            if (bulletRect.overlaps(enemyRect)) {
+              e.remove();
+              i.remove();
+              client.sendTCP(enemies);
+              break;
+            }
           }
         }
       }
-    }
-
-    synchronized (player.bullets) {
-      // Move bullets
-      for (Bullet bullet : player.bullets) {
-        if (bullet.velocity.y == 0) bullet.velocity.y += 0.01f;
-        bullet.position.x += bullet.velocity.x;
-        bullet.position.y += bullet.velocity.y;
-//        bullet.position.add(bullet.velocity);
+  
+      synchronized (player.bullets) {
+        // Move bullets
+//        for (Bullet bullet : player.bullets) {
+        for (int i = 0; i < player.bullets.size(); ++i) {
+          Bullet bullet = player.bullets.get(i);
+          if (bullet.velocity.y == 0) bullet.velocity.y += 0.01f;
+          bullet.position.x += bullet.velocity.x;
+          bullet.position.y += bullet.velocity.y;
+  //        bullet.position.add(bullet.velocity);
+        }
+  
+        // Limit number of bullets
+        if (player.bullets.size() > player.MAXBULLETS) {
+          player.bullets.remove(0);
+        }
       }
-
-      // Limit number of bullets
-      if (player.bullets.size() > player.MAXBULLETS) {
-        player.bullets.remove(0);
-      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      player.bullets.clear();
+    } catch (NullPointerException e) {
+      player.bullets.clear();
+    } catch (ConcurrentModificationException e) {
+      player.bullets.clear();
     }
   }
 

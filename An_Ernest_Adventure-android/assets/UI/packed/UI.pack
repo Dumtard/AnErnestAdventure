@@ -5,35 +5,42 @@ filter: Nearest,Nearest
 repeat: none
 UI_background
   rotate: false
-  xy: 1, 1
+  xy: 1, 7
   size: 800, 96
   orig: 800, 96
   offset: 0, 0
   index: -1
 Slide_Bar
   rotate: false
-  xy: 803, 64
+  xy: 803, 70
   size: 200, 33
   orig: 200, 33
   offset: 0, 0
   index: -1
 Jump_Down
   rotate: false
-  xy: 803, 29
+  xy: 803, 35
   size: 100, 33
   orig: 100, 33
   offset: 0, 0
   index: -1
 Jump_Up
   rotate: false
-  xy: 905, 29
+  xy: 905, 35
   size: 100, 33
   orig: 100, 33
   offset: 0, 0
   index: -1
+Heart
+  rotate: false
+  xy: 803, 1
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
 Slide_Selector
   rotate: false
-  xy: 1005, 64
+  xy: 1005, 70
   size: 8, 33
   orig: 8, 33
   offset: 0, 0

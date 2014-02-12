@@ -35,6 +35,10 @@ public class GameView {
   private Animation walkAnimation;
   private Animation idleAnimation;
   private Animation jumpAnimation;
+
+  private Animation redWalkAnimation;
+  private Animation redIdleAnimation;
+  private Animation redJumpAnimation;
   
   private Animation enemyIdleAnimation;
   private Animation bomberEnemyIdleAnimation;
@@ -85,6 +89,25 @@ public class GameView {
     idleAnimation = new Animation(0.5f, idleFrames);
     walkAnimation = new Animation(0.2f, walkFrames);
     jumpAnimation = new Animation(1f, jumpFrames);
+    
+    TextureRegion[] redIdleFrames = new TextureRegion[2];
+    for (int i = 0; i < 2; i++) {
+      redIdleFrames[i] = atlas.findRegion("RedIdle-" + i); 
+    }
+    
+    TextureRegion[] redWalkFrames = new TextureRegion[4];
+    for (int i = 0; i < 4; i++) {
+      redWalkFrames[i] = atlas.findRegion("RedWalk-" + i);
+    }
+    
+    TextureRegion[] redJumpFrames = new TextureRegion[1];
+    for (int i = 0; i < 1; i++) {
+      redJumpFrames[i] = atlas.findRegion("RedJump-" + i);
+    }
+    
+    redIdleAnimation = new Animation(0.5f, redIdleFrames);
+    redWalkAnimation = new Animation(0.2f, redWalkFrames);
+    redJumpAnimation = new Animation(1f, redJumpFrames);
     
     bullet = atlas.findRegion("Bullet");
     
@@ -186,7 +209,7 @@ public class GameView {
         if (currentPlayer.getVelocity().x != 0 &&
             currentPlayer.getIsGrounded()) { 
           if (currentPlayer.getIsFacingRight()) {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = redWalkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             if (currentFrame.isFlipX()) {
               currentFrame.flip(true, false);
             }
@@ -195,7 +218,7 @@ public class GameView {
                                      currentPlayer.getWidth(),
                                      currentPlayer.getHeight());
           } else {
-            TextureRegion currentFrame = walkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = redWalkAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             if (!currentFrame.isFlipX()) {
               currentFrame.flip(true, false);
             }
@@ -211,13 +234,13 @@ public class GameView {
                    (currentPlayer.getVelocity().x == 0 &&
                     !currentPlayer.getIsGrounded())) {
           if (currentPlayer.getIsFacingRight()) {
-            TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = redJumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             batch.draw(currentFrame, currentPlayer.getPosition().x,
                                      currentPlayer.getPosition().y,
                                      currentPlayer.getWidth(),
                                      currentPlayer.getHeight());
           } else {
-            TextureRegion currentFrame = jumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+            TextureRegion currentFrame = redJumpAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
             currentFrame.flip(true, false);
             batch.draw(currentFrame, currentPlayer.getPosition().x,
                                      currentPlayer.getPosition().y,
@@ -227,7 +250,7 @@ public class GameView {
           
         //Idle animations
         } else {
-          TextureRegion currentFrame = idleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
+          TextureRegion currentFrame = redIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
           batch.draw(currentFrame, currentPlayer.getPosition().x,
                                    currentPlayer.getPosition().y,
                                    currentPlayer.getWidth(),
@@ -298,27 +321,33 @@ public class GameView {
   
   private void renderBullets(float delta) {
     for (Map.Entry<String, Player> player: players.entrySet()) {
-      for (Bullet bullet : player.getValue().bullets) {
-        if (!bullet.hasVelocity()) {
-          bullet.setX((((bullet.getScreenX()/(float)Gdx.graphics.getWidth())*camera.viewportWidth)+
-              (camera.position.x-camera.viewportWidth/(float)2))-(bullet.size/2));
-          bullet.setY(((((camera.viewportHeight - bullet.getScreenY())/Gdx.graphics.getHeight())*
-              camera.viewportHeight)+camera.position.y)-(96-8)+(bullet.size/2));
+//      for (Bullet bullet : player.getValue().bullets) {
+      try {
+        for (int i = 0; i < player.getValue().bullets.size(); ++i) {
+          Bullet bullet = player.getValue().bullets.get(i);
+          if (!bullet.hasVelocity()) {
+            bullet.setX((((bullet.getScreenX()/(float)Gdx.graphics.getWidth())*camera.viewportWidth)+
+                (camera.position.x-camera.viewportWidth/(float)2))-(bullet.size/2));
+            bullet.setY(((((camera.viewportHeight - bullet.getScreenY())/Gdx.graphics.getHeight())*
+                camera.viewportHeight)+camera.position.y)-(96-8)+(bullet.size/2));
+            
+            bullet.velocity.x = bullet.position.x - (player.getValue().getPosition().x +
+                                                    (player.getValue().getWidth()/(float)2));
+            bullet.velocity.y = bullet.position.y - (player.getValue().getPosition().y +
+                                                    (player.getValue().getHeight()/(float)2));
+            bullet.velocity.nor().scl(5);
+            
+            bullet.position.x = (player.getValue().getPosition().x +
+                                (player.getValue().getWidth()/(float)2));
+            bullet.position.y = (player.getValue().getPosition().y +
+                                (player.getValue().getHeight()/(float)2));
+            bullet.position.add(new Vector2(bullet.velocity).scl(5));
+          }
           
-          bullet.velocity.x = bullet.position.x - (player.getValue().getPosition().x +
-                                                  (player.getValue().getWidth()/(float)2));
-          bullet.velocity.y = bullet.position.y - (player.getValue().getPosition().y +
-                                                  (player.getValue().getHeight()/(float)2));
-          bullet.velocity.nor().scl(5);
-          
-          bullet.position.x = (player.getValue().getPosition().x +
-                              (player.getValue().getWidth()/(float)2));
-          bullet.position.y = (player.getValue().getPosition().y +
-                              (player.getValue().getHeight()/(float)2));
-          bullet.position.add(new Vector2(bullet.velocity).scl(5));
+          batch.draw(this.bullet, bullet.position.x, bullet.position.y, bullet.size, bullet.size);
         }
+      } catch (NullPointerException e) {
         
-        batch.draw(this.bullet, bullet.position.x, bullet.position.y, bullet.size, bullet.size);
       }
     }
   }

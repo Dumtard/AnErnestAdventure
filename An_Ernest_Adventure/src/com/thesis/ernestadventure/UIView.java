@@ -20,12 +20,17 @@ public class UIView {
   TextureRegion UI_Jump_Up;
   TextureRegion UI_Jump_Down;
   
+  TextureRegion UI_Heart;
+  
+  private Player player;
+  
   private OrthographicCamera camera;
   
-  public UIView (UI ui, SpriteBatch batch, OrthographicCamera camera) {
+  public UIView (UI ui, SpriteBatch batch, OrthographicCamera camera, Player player) {
     this.batch = batch;
     this.camera = camera;
     this.ui = ui;
+    this.player = player;
     
     UI_Atlas = new TextureAtlas(Gdx.files.internal("UI/packed/UI.pack"));
     UI_Background = UI_Atlas.createSprite("UI_background");
@@ -33,6 +38,7 @@ public class UIView {
     UI_Slider_Selector = UI_Atlas.createSprite("Slide_Selector");
     UI_Jump_Up = UI_Atlas.createSprite("Jump_Up");
     UI_Jump_Down = UI_Atlas.createSprite("Jump_Down");
+    UI_Heart = UI_Atlas.createSprite("Heart");
   }
   
   public void render(float delta) {
@@ -60,5 +66,12 @@ public class UIView {
     batch.draw(UI_Slider_Selector, (camera.position.x - (camera.viewportWidth/2.0f))+5 + ((ui.slider.getPosition()+1)*100)-4,
                                    (camera.position.y - (camera.viewportHeight/2.0f))+30,
                                    8, 33);
+    
+    // Health
+    for (int i = 0; i < player.health; i++) {
+      batch.draw(UI_Heart, camera.position.x + (camera.viewportWidth/2.0f) - 275 + 33*i,
+          (camera.position.y - (camera.viewportHeight/2.0f))+30,
+          32, 32);
+    }
   }
 }

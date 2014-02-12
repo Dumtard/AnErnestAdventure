@@ -25,7 +25,7 @@ public class View {
 
     batch = new SpriteBatch();
     
-    uiView = new UIView(ui, batch, camera);
+    uiView = new UIView(ui, batch, camera, players.get(ErnestGame.loginName));
     gameView = new GameView(batch, camera, players, area, enemies);
   }
   

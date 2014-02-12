@@ -6,7 +6,7 @@ public class Tile {
   
   public Integer id;
   public Integer x, y;
-  public Boolean exit;
+  public Integer exit;
   public Boolean collidable;
   
   public Tile() {}
@@ -16,6 +16,6 @@ public class Tile {
     this.x = x;
     this.y = y;
     this.collidable = true;
-    this.exit = false;
+    this.exit = -1;
   }
 }
