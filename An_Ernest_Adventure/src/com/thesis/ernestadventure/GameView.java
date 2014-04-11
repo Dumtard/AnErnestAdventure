@@ -29,6 +29,7 @@ public class GameView {
   private Sprite sprite3;
   
   private Sprite floorSprite;
+  private Sprite backSprite;
   
   private TextureRegion bullet;
   
@@ -63,6 +64,7 @@ public class GameView {
     sprite3 = tileAtlas.createSprite("Tile@");
     
     floorSprite = tileAtlas.createSprite("FloorTile");
+    backSprite = tileAtlas.createSprite("BackTile");
     
     // TODO Move loading into this function
     loadTextures();
@@ -115,11 +117,11 @@ public class GameView {
     //enemy animations
     TextureAtlas enemyAtlas = new TextureAtlas(Gdx.files.internal("enemies/packed/Enemies.pack"));
     
-    TextureRegion[] enemyIdleFrames = new TextureRegion[1];
-    for (int i = 0; i < 1; i++) {
-      enemyIdleFrames[i] = enemyAtlas.findRegion("Poo");
+    TextureRegion[] enemyIdleFrames = new TextureRegion[4];
+    for (int i = 0; i < 4; i++) {
+      enemyIdleFrames[i] = enemyAtlas.findRegion("Enemy-" + i);
     }
-    enemyIdleAnimation = new Animation(0.5f, enemyIdleFrames);
+    enemyIdleAnimation = new Animation(0.25f, enemyIdleFrames);
     
     TextureRegion[] bomberEnemyIdleFrames = new TextureRegion[2];
     for (int i = 0; i < 2; i++) {
@@ -134,8 +136,21 @@ public class GameView {
     bomberBombIdleAnimation = new Animation(0.5f, bomberBombIdleFrames);
   }
   
+  private void renderAreaBack(float delta) {
+    for (int i = area.height-1; i >= 0; i--) {
+      for (int j = 0; j < area.width; j++) {
+        try {
+          backSprite.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+          backSprite.draw(batch);
+        } catch (NullPointerException e) {
+          Gdx.app.log("invalid tile coordinates: ", i + " " + j);
+        }
+      }
+    }
+  }
+  
   private void renderArea(float delta) {
-    for (int i = 0; i < area.height; i++) {
+    for (int i = area.height-1; i >= 0; i--) {
       for (int j = 0; j < area.width; j++) {
         try {
 //        Gdx.app.log("tile: ", "(" + i + " ," + j + ")");
@@ -146,6 +161,28 @@ public class GameView {
           sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite2.draw(batch);
         } else if (area.tiles[j][i].id == '@'){
+          sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+          sprite3.draw(batch);
+        }
+        } catch (NullPointerException e) {
+          Gdx.app.log("invalid tile coordinates: ", i + " " + j);
+        }
+      }
+    }
+  }
+  
+  private void renderAreaForeground(float delta) {
+    for (int i = 0; i < area.height; i++) {
+      for (int j = 0; j < area.width; j++) {
+        try {
+//        Gdx.app.log("tile: ", "(" + i + " ," + j + ")");
+        if (area.tiles[j][i].foregroundid == '#') {
+          floorSprite.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+          floorSprite.draw(batch);
+        } else if (area.tiles[j][i].foregroundid == '$') {
+          sprite2.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
+          sprite2.draw(batch);
+        } else if (area.tiles[j][i].foregroundid == '@'){
           sprite3.setPosition(area.tiles[j][i].x, area.tiles[j][i].y);
           sprite3.draw(batch);
         }
@@ -191,10 +228,23 @@ public class GameView {
       } else if (enemies.get(i) instanceof Enemy) {
         //draw enemy
         currentFrame = enemyIdleAnimation.getKeyFrame(ErnestGame.GAMETIME, true);
-        batch.draw(currentFrame, enemies.get(i).getPosition().x,
-            enemies.get(i).getPosition().y,
-            currentFrame.getRegionWidth(),
-            currentFrame.getRegionHeight());
+        if (enemies.get(i).isFacingRight) {
+          if (!currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+          }
+          batch.draw(currentFrame, enemies.get(i).getPosition().x,
+              enemies.get(i).getPosition().y,
+              currentFrame.getRegionWidth(),
+              currentFrame.getRegionHeight());
+        } else {
+          if (currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+          }
+          batch.draw(currentFrame, enemies.get(i).getPosition().x,
+              enemies.get(i).getPosition().y,
+              currentFrame.getRegionWidth(),
+              currentFrame.getRegionHeight());
+        }
       }
     }
   }
@@ -380,10 +430,12 @@ public class GameView {
   }
   
   synchronized public void render(float delta) {
+    renderAreaBack(delta);
     renderArea(delta);
     renderEnemies(delta);
     renderPlayers(delta);
     renderBullets(delta);
+    renderAreaForeground(delta);
   }
   
 }

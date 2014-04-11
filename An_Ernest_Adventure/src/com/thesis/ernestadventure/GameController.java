@@ -51,16 +51,18 @@ public class GameController {
       // Update Player location
       player
           .setPosition(player.getPosition().x
-              + (player.getVelocity().x * delta * Tile.SIZE),
+              + (player.getVelocity().x*1.5f * delta * Tile.SIZE),
               player.getPosition().y
                   + (player.getVelocity().y * delta * Tile.SIZE));
 
       bulletCollision(player);
     }
 
+
     for (Enemy enemy : enemies) {
       enemyController.update(enemy, delta);
     }
+    
   }
 
   // TODO refactor collisions into function(tilepositionX, tilepositionY)
@@ -140,7 +142,7 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+             // player.setVelocity(0, player.getVelocity().y);
             }
           }
         } else if (area.tiles[tilePositionX + 1][tilePositionY + 1].collidable) {
@@ -152,7 +154,7 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+              //player.setVelocity(0, player.getVelocity().y);
             }
           }
         } else if (area.tiles[tilePositionX + 1][tilePositionY + 2].collidable) {
@@ -164,7 +166,7 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x - Tile.SIZE, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+              //player.setVelocity(0, player.getVelocity().y);
             }
           }
 
@@ -224,7 +226,7 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+              //player.setVelocity(0, player.getVelocity().y);
             }
           }
         } else if (area.tiles[tilePositionX][tilePositionY + 1].collidable) {
@@ -236,7 +238,7 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+              //player.setVelocity(0, player.getVelocity().y);
             }
           }
         } else if (area.tiles[tilePositionX][tilePositionY + 2].collidable) {
@@ -248,14 +250,13 @@ public class GameController {
           if (playerRect.overlaps(blockRect)) {
             player.setPosition(blockRect.x + Tile.SIZE + 2, playerRect.y);
             if (player.getVelocity().y < 0) {
-              player.setVelocity(0, player.getVelocity().y);
+              //player.setVelocity(0, player.getVelocity().y);
             }
           }
         }
         
         if (area.tiles[tilePositionX][tilePositionY].exit >= 0 &&
             name.equals(ErnestGame.loginName)) {
-          System.out.println("HIT LOADING ZONE");
           int warpLocation = area.warps[area.tiles[tilePositionX][tilePositionY].exit];
           enemies.clear();
           try {
@@ -565,7 +566,7 @@ public class GameController {
         players.get(ErnestGame.loginName)
             .setVelocity(
                 new Vector2(players.get(ErnestGame.loginName).getVelocity().x,
-                    8.5f));
+                    10.0f));
         players.get(ErnestGame.loginName).setIsGrounded(false);
         Move move = new Move();
         move.name = ErnestGame.loginName;

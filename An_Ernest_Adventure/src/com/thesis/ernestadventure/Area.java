@@ -67,7 +67,7 @@ public class Area {
           
           for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, (i*Tile.SIZE));
+              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, i*Tile.SIZE);
             }
             
             line = reader.readLine();
@@ -78,7 +78,7 @@ public class Area {
           
           for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-              if (line.charAt(j) == '#') {
+              if (line.charAt(j) != '.') {
                 tiles[j][i].id = (int)line.charAt(j);
               }
             }
@@ -88,9 +88,9 @@ public class Area {
         if (line.equals("Front:")) {
           line = reader.readLine();
           
-          for (int i = 0; i < height; i++) {
+          for (int i = height-1; i >= 0; i--) {
             for (int j = 0; j < width; j++) {
-//              tiles[j][i] = new Tile(line.charAt(j), j*Tile.SIZE, (GameScreen.GAMEHEIGHT-Tile.SIZE)-(i*Tile.SIZE));
+              tiles[j][i].foregroundid = (int)line.charAt(j);
             }
             line = reader.readLine();
           }

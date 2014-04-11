@@ -218,11 +218,25 @@ public class GameScreen implements Screen {
       for (int i = 0; i < area.enemyPositions.size(); ++i) {
         Vector2 position = area.enemyPositions.get(i);
         
+        double random = Math.random();
+        
         if (area.enemyType.get(i) == '#') {
           Enemy e = new Enemy(position);
+
+          if (random > 0.5) {
+            e.isFacingRight = false;
+            e.velocity.scl(-1);
+          }
+          
           enemies.add(e);
         } else if (area.enemyType.get(i) == '@') {
           BomberEnemy e = new BomberEnemy(position);
+          
+          if (random > 0.5) {
+            e.isFacingRight = false;
+            e.velocity.scl(-1);
+          }
+          
           enemies.add(e);
         }
       }

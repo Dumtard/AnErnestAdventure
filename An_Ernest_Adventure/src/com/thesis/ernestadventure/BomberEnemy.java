@@ -8,21 +8,21 @@ public class BomberEnemy extends Enemy {
   public float bulletVelocity = -4;
   
   public BomberEnemy() {
-    position = new Vector2(100, 300);
-    velocity = new Vector2(40, 0);
-    width = 64;
-    height = 32;
-    isGrounded = false;
-    isFacingRight = true;
+    this.position = new Vector2(100, 300);
+    this.velocity = new Vector2(40, 0);
+    this.width = 64;
+    this.height = 32;
+    this.isGrounded = false;
+    this.isFacingRight = true;
   }
   
   public BomberEnemy(Vector2 position) {
-    position = new Vector2(position);
-    velocity = new Vector2(40, 0);
-    width = 64;
-    height = 32;
-    isGrounded = false;
-    isFacingRight = true;
+    this.position = new Vector2(position);
+    this.velocity = new Vector2(40, 0);
+    this.width = 64;
+    this.height = 32;
+    this.isGrounded = false;
+    this.isFacingRight = true;
   }
   
   @Override

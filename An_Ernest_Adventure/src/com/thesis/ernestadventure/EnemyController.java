@@ -23,6 +23,7 @@ public class EnemyController {
   }
   
   public void update (Enemy enemy, float delta) {
+    
     enemy.setPosition(enemy.getPosition().x + (enemy.getVelocity().x * delta),
                       enemy.getPosition().y + (enemy.getVelocity().y * delta));
 
@@ -30,6 +31,7 @@ public class EnemyController {
     int tilePositionY = (int) (enemy.getPosition().y / Tile.SIZE);
     
     if (enemy instanceof BomberEnemy) {
+      
       
       if (area.tiles[tilePositionX+2][tilePositionY].collidable ||
           area.tiles[tilePositionX][tilePositionY].collidable) {
@@ -97,7 +99,7 @@ public class EnemyController {
         } else if ( enemy.getVelocity().x < 0) {
           enemy.setPosition((tilePositionX+1) * Tile.SIZE, enemy.getPosition().y);
         }
-        
+        enemy.isFacingRight = (!enemy.isFacingRight);
         enemy.getVelocity().scl(-1);
       }
     }

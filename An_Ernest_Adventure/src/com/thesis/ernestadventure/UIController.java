@@ -63,7 +63,7 @@ public class UIController {
         players.get(ErnestGame.loginName)
             .setVelocity(
                 new Vector2(players.get(ErnestGame.loginName).getVelocity().x,
-                    8.5f));
+                    10.0f));
         players.get(ErnestGame.loginName).setIsGrounded(false);
           Move move = new Move();
           move.name = ErnestGame.loginName;

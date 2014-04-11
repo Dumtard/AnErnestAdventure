@@ -11,7 +11,7 @@ public class Enemy {
   protected int height;
   
   protected boolean isGrounded;
-  protected boolean isFacingRight;
+  public boolean isFacingRight;
   
   public Enemy() {
     position = new Vector2(100, 300);
